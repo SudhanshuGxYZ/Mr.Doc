@@ -1,21 +1,37 @@
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LandingPage from './pages/LandingPage'; 
+import { Bot, MessageSquare, Users, Shield, ArrowRight, AlertTriangle } from 'lucide-react';
+import LandingPage from './pages/LandingPage';
 import ChatPage from './pages/ChatPage';
 import AuthModal from './components/AuthModal';
-import React, { useState } from 'react';
+import LoadingSpinner from './components/LoadingSpinner';
 
 const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isLogin, setIsLogin] = useState(true);
+  const [isPageTransition, setIsPageTransition] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Initial loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAuthSuccess = (token: string) => {
     setToken(token);
     setShowAuthModal(false);
+    setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
     setToken(null);
+    setIsAuthenticated(false);
   };
 
   const handleAuthClick = (isLoginMode: boolean) => {
@@ -24,30 +40,39 @@ const App: React.FC = () => {
   };
 
   const handlePageTransition = () => {
-    // You can add additional actions here if needed
-    console.log("Page transition to chat initiated.");
+    setIsPageTransition(true);
+    setTimeout(() => {
+      setIsPageTransition(false);
+    }, 2000);
   };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Router>
-      <div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 relative">
+        {isPageTransition && <LoadingSpinner />}
         {showAuthModal && (
-          <AuthModal
-            isLogin={isLogin}
-            onClose={() => setShowAuthModal(false)}
-            onSuccess={handleAuthSuccess}
-            onToggleMode={() => setIsLogin(!isLogin)}
-          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <AuthModal
+              isLogin={isLogin}
+              onClose={() => setShowAuthModal(false)}
+              onSuccess={handleAuthSuccess}
+              onToggleMode={() => setIsLogin(!isLogin)}
+            />
+          </div>
         )}
 
         <Routes>
           <Route
             path="/"
-            element={<LandingPage onAuthClick={handleAuthClick} isAuthenticated={!!token} onPageTransition={handlePageTransition} />}
+            element={<LandingPage onAuthClick={handleAuthClick} isAuthenticated={isAuthenticated} onPageTransition={handlePageTransition} />}
           />
           <Route
             path="/chat"
-            element={token ? <ChatPage token={token} onLogout={handleLogout} /> : <Navigate to="/" />}
+            element={isAuthenticated && token ? <ChatPage token={token} onLogout={handleLogout} /> : <Navigate to="/" />}
           />
         </Routes>
       </div>
