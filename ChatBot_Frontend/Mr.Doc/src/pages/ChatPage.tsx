@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, LogOut } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -18,6 +18,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Fetch chat history on component mount
   useEffect(() => {
@@ -51,6 +57,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
         });
 
         setMessages(history);
+        scrollToBottom();
       } catch (error) {
         console.error('Error:', error);
       }
@@ -59,6 +66,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
 
     fetchChatHistory();
   }, [token]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      scrollToBottom();
+    }
+  }, [messages, isLoading]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,10 +168,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
         {loading && (
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-lg px-4 py-2 bg-white shadow-sm text-gray-900">
-            <Bot className="h-5 w-5 text-indigo-600 animate-bounce" />
+              <Bot className="h-5 w-5 text-indigo-600 animate-bounce" />
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       <form onSubmit={handleSend} className="p-4 bg-white border-t">
