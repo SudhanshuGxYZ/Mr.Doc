@@ -1,6 +1,7 @@
 #  🤖 Mr.Doc
+🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️
 
-Welcome to **MR Doc 🚀**, an intuitive and powerful documentation management solution. This repository houses the source code for the website hosted at [mr.doc](https://mr-doc-23wi.vercel.app).
+Welcome to **MR Doc 🚀**, an intuitive and powerful documentation management solution. This repository houses the source code for the website hosted at [mr.doc🤖](https://mr-doc-23wi.vercel.app).
 
 ## About 📖
 MR Doc 🚀 is a cutting-edge web application engineered to enhance documentation workflows with efficiency, security, and seamless collaboration. It empowers users with a feature-rich environment for creating, organizing, and sharing documentation effortlessly. Designed with an intuitive user experience, MR Doc 🚀 is an indispensable tool for teams and individuals alike.
@@ -72,6 +73,8 @@ We welcome contributions from the community! To contribute:
    ```
 5. Submit a Pull Request for review.
 
+---
+🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️🏴‍☠️
 ---
 
 📩 For inquiries, suggestions, or collaborations, feel free to reach out!
