@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Send, Bot } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Send, Bot, LogOut } from 'lucide-react';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
   id: number;
@@ -7,13 +8,59 @@ interface Message {
   isUser: boolean;
 }
 
-const ChatPage: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, text: "Hello! How can I help you today?", isUser: false }
-  ]);
-  const [input, setInput] = useState("");
+interface ChatPageProps {
+  token: string;
+  onLogout: () => void;
+}
 
-  const handleSend = (e: React.FormEvent) => {
+const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch chat history on component mount
+  useEffect(() => {
+    const fetchChatHistory = async () => {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      try {
+        const response = await fetch('http://localhost:8000/api/chat/prompts/', {
+          headers: {
+            'Authorization': `token ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch chat history');
+        }
+
+        const data = await response.json();
+        const history: Message[] = [];
+
+        data.forEach((item: any, index: number) => {
+          history.push({
+            id: index * 2 + 1,
+            text: item.input_text,
+            isUser: true
+          });
+          history.push({
+            id: index * 2 + 2,
+            text: item.response_text,
+            isUser: false
+          });
+        });
+
+        setMessages(history);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchChatHistory();
+  }, [token]);
+
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -24,23 +71,67 @@ const ChatPage: React.FC = () => {
       isUser: true
     };
 
-    // Simulate bot response
-    const botMessage: Message = {
-      id: messages.length + 2,
-      text: "I'm a demo bot. This is a simulated response to your message.",
-      isUser: false
-    };
-
-    setMessages([...messages, userMessage, botMessage]);
+    setMessages([...messages, userMessage]);
     setInput("");
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/chat/prompts/get_gemini_response/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input_text: input })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+
+      // Add bot response
+      const botMessage: Message = {
+        id: messages.length + 2,
+        text: data.response_text,
+        isUser: false
+      };
+
+      setMessages([...messages, userMessage, botMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle error response
+      const errorMessage: Message = {
+        id: messages.length + 2,
+        text: 'An error occurred. Please try again later.',
+        isUser: false
+      };
+      setMessages([...messages, userMessage, errorMessage]);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center">
-          <Bot className="h-6 w-6 text-indigo-600" />
-          <span className="ml-2 font-semibold text-gray-900">Chat Assistant</span>
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <Bot className="h-6 w-6 text-indigo-600" />
+            <span className="ml-2 font-semibold text-gray-900">Chat Assistant</span>
+          </div>
+          <button
+            onClick={onLogout}
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="ml-2">Logout</span>
+          </button>
         </div>
       </div>
 
@@ -61,6 +152,13 @@ const ChatPage: React.FC = () => {
             </div>
           </div>
         ))}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-lg px-4 py-2 bg-white shadow-sm text-gray-900">
+            <Bot className="h-5 w-5 text-indigo-600 animate-bounce" />
+            </div>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSend} className="p-4 bg-white border-t">
@@ -75,6 +173,7 @@ const ChatPage: React.FC = () => {
           <button
             type="submit"
             className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
+            disabled={loading}
           >
             <Send className="h-5 w-5" />
           </button>

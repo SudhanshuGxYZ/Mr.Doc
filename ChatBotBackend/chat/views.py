@@ -17,6 +17,7 @@ def call_gemini_api(input_text, max_tokens=100):
         f"As a mental health assistant, provide supportive advice and encouragement "
         f"for the following issue: {input_text}. Then, ask two or three precise follow-up "
         f"questions to better understand and help address the user's concerns."
+        f"use emoji's to act like a real person is talking to you and keep your responses short and concise."
     )
 
     model = genai.GenerativeModel("gemini-1.5-flash")  
@@ -32,6 +33,12 @@ class PromptViewSet(viewsets.ModelViewSet):
     serializer_class = PromptSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Prompt.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     @action(detail=False, methods=['post'])
     def get_gemini_response(self, request):

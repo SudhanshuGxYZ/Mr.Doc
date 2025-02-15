@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 interface AuthModalProps {
   isLogin: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (token: string) => void;
   onToggleMode: () => void;
 }
 
@@ -14,13 +14,38 @@ const AuthModal: React.FC<AuthModalProps> = ({
   onSuccess,
   onToggleMode,
 }) => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would handle authentication here
-    onSuccess();
+    setError('');
+
+    const url = `http://localhost:8000/api/${isLogin ? 'login' : 'register'}/`;
+    const body = isLogin
+      ? { username, password }
+      : { username, email, password };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error('Authentication failed');
+      }
+
+      const data = await response.json();
+      onSuccess(data.token);
+    } catch (error) {
+      setError('Authentication failed. Please check your credentials and try again.');
+    }
   };
 
   return (
@@ -39,18 +64,34 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              Username
             </label>
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
               required
             />
           </div>
+
+          {!isLogin && (
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                required
+              />
+            </div>
+          )}
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -65,6 +106,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
               required
             />
           </div>
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"

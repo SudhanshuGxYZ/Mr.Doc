@@ -58,11 +58,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     'django_rest_passwordreset',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -151,4 +153,9 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS")
 EMAIL_HOST = config("EMAIL_HOST")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # Adjust the URL based on your frontend's URL
+]
 
