@@ -12,8 +12,6 @@ MR Doc 🚀 is a cutting-edge web application engineered to enhance documentatio
 - **Enterprise-Grade Security**: Robust encryption and data protection mechanisms.
 - **Lightning-Fast Performance**: Optimized for speed and reliability, ensuring a smooth experience.
 
-![Collaboration](public/collaboration.png) ![Cloud Access](public/cloud-access.png) ![Security](public/security.png)
-
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
