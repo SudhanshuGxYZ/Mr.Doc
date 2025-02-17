@@ -21,42 +21,48 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
+  
+  if (!isLogin) {
     setLoading(true);
+  }
 
-    const url = `https://aidocbackend.pythonanywhere.com/api/${isLogin ? 'login' : 'register'}/`;
-    const body = isLogin
-      ? { username, password }
-      : { username, email, password };
+  const url = `https://aidocbackend.pythonanywhere.com/api/${isLogin ? 'login' : 'register'}/`;
+  const body = isLogin
+    ? { username, password }
+    : { username, email, password };
 
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
 
-      if (!response.ok) {
-        throw new Error('Authentication failed');
-      }
-
-      const data = await response.json();
-
-      localStorage.setItem('token', data.token);
-      
-      setTimeout(() => {
-        setLoading(false);
-        onSuccess(data.token); // Proceed to landing page or chat on successful login/signup
-      }, 2000); // Simulate 2 seconds loading time
-    } catch (error) {
-      setLoading(false);
-      setError('Authentication failed. Please check your credentials and try again.');
+    if (!response.ok) {
+      throw new Error('Authentication failed');
     }
-  };
+
+    const data = await response.json();
+
+    localStorage.setItem('token', data.token);
+
+    if (!isLogin) {
+      setLoading(false);
+    }
+    onSuccess(data.token); // Proceed to landing page or chat on successful login/signup
+    
+  } catch (error) {
+    if (!isLogin) {
+      setLoading(false);
+    }
+    setError('Authentication failed. Please check your credentials and try again.');
+  }
+};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
