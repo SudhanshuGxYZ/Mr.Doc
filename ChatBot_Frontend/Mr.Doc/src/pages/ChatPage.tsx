@@ -25,6 +25,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const token = localStorage.getItem('token');
+
   // Fetch chat history on component mount
   useEffect(() => {
     const fetchChatHistory = async () => {
