@@ -37,7 +37,7 @@ const App: React.FC = () => {
     setShowSuccessPopup(true);
     setTimeout(() => {
       setShowSuccessPopup(false);
-    }, 2000);
+    }, 3200);
   };
   
 
@@ -55,7 +55,7 @@ const App: React.FC = () => {
     setIsPageTransition(true);
     setTimeout(() => {
       setIsPageTransition(false);
-    }, 3200);
+    }, 2000);
   };
 
   if (isLoading) {
