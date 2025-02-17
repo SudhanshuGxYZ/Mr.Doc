@@ -12,7 +12,7 @@ interface ChatPageProps {
   onLogout: () => void;
 }
 
-const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
+const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,6 +24,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Retrieve token from local storage
   const token = localStorage.getItem('token');
 
   // Fetch chat history on component mount
@@ -33,7 +34,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
       try {
         const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/', {
           headers: {
-            'Authorization': `token ${token}`
+            'Authorization': `Token ${token}`
           }
         });
 
@@ -93,7 +94,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
       const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
         method: 'POST',
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': `Token ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ input_text: input })
