@@ -62,40 +62,40 @@ const App: React.FC = () => {
     return <LoadingSpinner />;
   }
 
-  return (
-    <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 relative">
-        {isPageTransition && <LoadingSpinner />}
-        {showAuthModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <AuthModal
-              isLogin={isLogin}
-              onClose={() => setShowAuthModal(false)}
-               onSuccess={isLogin ? handleLogin : handleSignupSuccess}
-              onToggleMode={() => setIsLogin(!isLogin)}
-            />
-          </div>
-        )}
-        {showSuccessPopup && (
-          <SuccessPopup
-            message="Sign up successful! Please login to continue."
-            onClose={() => setShowSuccessPopup(false)}
-          />
-        )}
+return (
+  <Router>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 relative">
+      {isPageTransition && <LoadingSpinner />}
+      <Routes>
+        <Route
+          path="/"
+          element={<LandingPage onAuthClick={handleAuthClick} isAuthenticated={isAuthenticated} onPageTransition={handlePageTransition} />}
+        />
+        <Route
+          path="/chat"
+          element={isAuthenticated && token ? <ChatPage token={token} onLogout={handleLogout} /> : <Navigate to="/" />}
+        />
+        
+      </Routes>
 
-        <Routes>
-          <Route
-            path="/"
-            element={<LandingPage onAuthClick={handleAuthClick} isAuthenticated={isAuthenticated} onPageTransition={handlePageTransition} />}
+      {showAuthModal && (
+          <AuthModal
+            isLogin={isLogin}
+            onClose={() => setShowAuthModal(false)}
+             onSuccess={isLogin ? handleLogin : handleSignupSuccess}
+            onToggleMode={() => setIsLogin(!isLogin)}
           />
-          <Route
-            path="/chat"
-            element={isAuthenticated && token ? <ChatPage token={token} onLogout={handleLogout} /> : <Navigate to="/" />}
-          />
-        </Routes>
-      </div>
-    </Router>
-  );
+      )}
+
+      {showSuccessPopup && (
+        <SuccessPopup
+          message="Sign up successful! Please login to continue."
+          onClose={() => setShowSuccessPopup(false)}
+        />
+      )}
+    </div>
+  </Router>
+);
 };
 
 export default App;
