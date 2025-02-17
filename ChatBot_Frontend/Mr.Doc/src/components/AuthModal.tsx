@@ -45,7 +45,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       const data = await response.json();
 
       if (!isLogin) {
-        onToggleMode(); // Toggle to login mode
+         onSuccess(data.token); // Directly proceed to landing page on successful signup
       } else {
         onSuccess(data.token); // Only proceed to chat on successful login
       }
