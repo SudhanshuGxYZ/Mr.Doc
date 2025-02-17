@@ -71,7 +71,7 @@ const App: React.FC = () => {
             <AuthModal
               isLogin={isLogin}
               onClose={() => setShowAuthModal(false)}
-              onSuccess={handleAuthSuccess}
+               onSuccess={isLogin ? handleLogin : handleSignupSuccess}
               onToggleMode={() => setIsLogin(!isLogin)}
             />
           </div>
