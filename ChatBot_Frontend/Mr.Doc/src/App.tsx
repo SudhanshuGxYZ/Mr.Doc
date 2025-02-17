@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage';
 import ChatPage from './pages/ChatPage';
 import AuthModal from './components/AuthModal';
 import LoadingSpinner from './components/LoadingSpinner';
+import SuccessPopup from './components/SuccessPopup';
 
 const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
@@ -13,6 +14,8 @@ const App: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isPageTransition, setIsPageTransition] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
 
   useEffect(() => {
     // Initial loading
@@ -62,6 +65,12 @@ const App: React.FC = () => {
               onSuccess={handleAuthSuccess}
               onToggleMode={() => setIsLogin(!isLogin)}
             />
+            {showSuccessPopup && (
+          <SuccessPopup
+            message="Sign up successful! Please login to continue."
+            onClose={() => setShowSuccessPopup(false)}
+          />
+        )}
           </div>
         )}
 
