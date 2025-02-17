@@ -31,6 +31,15 @@ const App: React.FC = () => {
     setShowAuthModal(false);
     setIsAuthenticated(true);
   };
+  
+  const handleSignupSuccess = () => {
+    setShowAuthModal(false);
+    setShowSuccessPopup(true);
+    setTimeout(() => {
+      setShowSuccessPopup(false);
+    }, 2000);
+  };
+  
 
   const handleLogout = () => {
     setToken(null);
