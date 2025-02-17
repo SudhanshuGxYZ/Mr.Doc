@@ -44,6 +44,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       }
 
       const data = await response.json();
+      console.log('Token received:', data.token); // Debugging log
       onSuccess(data.token); // Call onSuccess with the actual token
     } catch (error) {
       setError('Authentication failed. Please check your credentials and try again.');
