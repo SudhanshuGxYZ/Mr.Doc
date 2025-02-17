@@ -79,6 +79,7 @@ return (
       </Routes>
 
       {showAuthModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <AuthModal
             isLogin={isLogin}
             onClose={() => setShowAuthModal(false)}
