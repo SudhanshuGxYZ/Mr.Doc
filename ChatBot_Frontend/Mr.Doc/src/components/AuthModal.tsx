@@ -42,7 +42,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
       }
 
       const data = await response.json();
-      onSuccess(data.token);
+
+      if (!isLogin) {
+        onToggleMode(); // Toggle to login mode
+      } else {
+        onSuccess(data.token); // Only proceed to chat on successful login
+      }
     } catch (error) {
       setError('Authentication failed. Please check your credentials and try again.');
     }
