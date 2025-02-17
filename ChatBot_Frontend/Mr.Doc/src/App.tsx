@@ -65,13 +65,13 @@ const App: React.FC = () => {
               onSuccess={handleAuthSuccess}
               onToggleMode={() => setIsLogin(!isLogin)}
             />
-            {showSuccessPopup && (
+          </div>
+        )}
+        {showSuccessPopup && (
           <SuccessPopup
             message="Sign up successful! Please login to continue."
             onClose={() => setShowSuccessPopup(false)}
           />
-        )}
-          </div>
         )}
 
         <Routes>
