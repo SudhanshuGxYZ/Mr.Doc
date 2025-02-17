@@ -21,16 +21,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsLoading(false);
-    onSuccess('');
 
     const url = `https://aidocbackend.pythonanywhere.com/api/${isLogin ? 'login' : 'register'}/`;
     const body = isLogin
@@ -51,14 +44,11 @@ const AuthModal: React.FC<AuthModalProps> = ({
       }
 
       const data = await response.json();
-
-      if (!isLogin) {
-         onSuccess(data.token); // Directly proceed to landing page on successful signup
-      } else {
-        onSuccess(data.token); // Only proceed to chat on successful login
-      }
+      onSuccess(data.token); // Call onSuccess with the actual token
     } catch (error) {
       setError('Authentication failed. Please check your credentials and try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
