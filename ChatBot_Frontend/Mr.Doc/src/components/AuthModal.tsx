@@ -23,7 +23,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     setError('');
 
-    const url = `http://localhost:8000/api/${isLogin ? 'login' : 'register'}/`;
+    const url = `https://aidocbackend.pythonanywhere.com/api/${isLogin ? 'login' : 'register'}/`;
     const body = isLogin
       ? { username, password }
       : { username, email, password };
