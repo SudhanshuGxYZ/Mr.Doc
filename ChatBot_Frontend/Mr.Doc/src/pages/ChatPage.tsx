@@ -30,7 +30,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
     const fetchChatHistory = async () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       try {
-        const response = await fetch('http://localhost:8000/api/chat/prompts/', {
+        const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/', {
           headers: {
             'Authorization': `token ${token}`
           }
@@ -89,7 +89,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ token, onLogout }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/chat/prompts/get_gemini_response/', {
+      const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
         method: 'POST',
         headers: {
           'Authorization': `token ${token}`,
