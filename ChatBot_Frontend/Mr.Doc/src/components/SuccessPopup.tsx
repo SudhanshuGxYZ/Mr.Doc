@@ -10,7 +10,7 @@ const SuccessPopup: React.FC<SuccessPopupProps> = ({ message, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 2000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [onClose]);
