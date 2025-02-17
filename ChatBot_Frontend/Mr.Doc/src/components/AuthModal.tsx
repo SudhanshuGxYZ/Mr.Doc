@@ -46,6 +46,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
       const data = await response.json();
 
+      localStorage.setItem('token', data.token);
+      
       setTimeout(() => {
         setLoading(false);
         onSuccess(data.token); // Proceed to landing page or chat on successful login/signup
