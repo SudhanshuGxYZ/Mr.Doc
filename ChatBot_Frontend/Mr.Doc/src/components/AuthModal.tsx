@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import LoadingSpinner from './LoadingSpinner';
 
 interface AuthModalProps {
   isLogin: boolean;
