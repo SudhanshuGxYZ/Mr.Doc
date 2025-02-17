@@ -37,7 +37,7 @@ const App: React.FC = () => {
     setShowSuccessPopup(true);
     setTimeout(() => {
       setShowSuccessPopup(false);
-    }, 3200);
+    }, 4000);
   };
   
 
