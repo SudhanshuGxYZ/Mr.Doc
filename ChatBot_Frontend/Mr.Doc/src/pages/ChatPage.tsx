@@ -9,7 +9,6 @@ interface Message {
 }
 
 interface ChatPageProps {
-  token: string;
   onLogout: () => void;
 }
 
