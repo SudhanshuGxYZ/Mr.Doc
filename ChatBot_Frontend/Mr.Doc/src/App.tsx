@@ -55,7 +55,7 @@ const App: React.FC = () => {
     setIsPageTransition(true);
     setTimeout(() => {
       setIsPageTransition(false);
-    }, 2000);
+    }, 3200);
   };
 
   if (isLoading) {
