@@ -19,10 +19,18 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setIsLoading(true);
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsLoading(false);
+    onSuccess('');
 
     const url = `https://aidocbackend.pythonanywhere.com/api/${isLogin ? 'login' : 'register'}/`;
     const body = isLogin
@@ -56,6 +64,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      {isLoading && <LoadingSpinner />}
       <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
         <button
           onClick={onClose}
