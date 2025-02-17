@@ -66,6 +66,23 @@ return (
   <Router>
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 relative">
       {isPageTransition && <LoadingSpinner />}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <AuthModal
+            isLogin={isLogin}
+            onClose={() => setShowAuthModal(false)}
+             onSuccess={isLogin ? handleLogin : handleSignupSuccess}
+            onToggleMode={() => setIsLogin(!isLogin)}
+          />
+        </div>
+      )}
+      {showSuccessPopup && (
+        <SuccessPopup
+          message="Sign up successful! Please login to continue."
+          onClose={() => setShowSuccessPopup(false)}
+        />
+      )}
+
       <Routes>
         <Route
           path="/"
@@ -75,25 +92,7 @@ return (
           path="/chat"
           element={isAuthenticated && token ? <ChatPage token={token} onLogout={handleLogout} /> : <Navigate to="/" />}
         />
-        
       </Routes>
-
-      {showAuthModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <AuthModal
-            isLogin={isLogin}
-            onClose={() => setShowAuthModal(false)}
-             onSuccess={isLogin ? handleLogin : handleSignupSuccess}
-            onToggleMode={() => setIsLogin(!isLogin)}
-          />
-      )}
-
-      {showSuccessPopup && (
-        <SuccessPopup
-          message="Sign up successful! Please login to continue."
-          onClose={() => setShowSuccessPopup(false)}
-        />
-      )}
     </div>
   </Router>
 );
