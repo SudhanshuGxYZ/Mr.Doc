@@ -19,10 +19,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     const url = `https://aidocbackend.pythonanywhere.com/api/${isLogin ? 'login' : 'register'}/`;
     const body = isLogin
@@ -44,12 +46,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
       const data = await response.json();
 
-      if (!isLogin) {
-        onSuccess(data.token); // Directly proceed to landing page on successful signup
-      } else {
-        onSuccess(data.token); // Only proceed to chat on successful login
-      }
+      setTimeout(() => {
+        setLoading(false);
+        onSuccess(data.token); // Proceed to landing page or chat on successful login/signup
+      }, 2000); // Simulate 2 seconds loading time
     } catch (error) {
+      setLoading(false);
       setError('Authentication failed. Please check your credentials and try again.');
     }
   };
@@ -68,60 +70,64 @@ const AuthModal: React.FC<AuthModalProps> = ({
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              required
-            />
-          </div>
-
-          {!isLogin && (
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
               </label>
               <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
                 required
               />
             </div>
-          )}
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              required
-            />
-          </div>
+            {!isLogin && (
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  required
+                />
+              </div>
+            )}
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white rounded-md px-4 py-2 hover:bg-indigo-700 transition-colors"
-          >
-            {isLogin ? 'Login' : 'Sign Up'}
-          </button>
-        </form>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white rounded-md px-4 py-2 hover:bg-indigo-700 transition-colors"
+            >
+              {isLogin ? 'Login' : 'Sign Up'}
+            </button>
+          </form>
+        )}
 
         <p className="mt-4 text-center text-sm text-gray-600">
           {isLogin ? "Don't have an account?" : "Already have an account?"}
