@@ -5,6 +5,16 @@ Welcome to **MR Doc 🚀**, an intuitive and powerful documentation management s
 ## About 📖
 MR Doc 🚀 is a cutting-edge web application engineered to enhance documentation workflows with efficiency, security, and seamless collaboration. It empowers users with a feature-rich environment for creating, organizing, and sharing documentation effortlessly. Designed with an intuitive user experience, MR Doc 🚀 is an indispensable tool for teams and individuals alike.
 
+### **🔹 Summary of Mr.Doc’s Features 🔹**  
+✔️ **Provides home remedies first** 🏡  
+✔️ **Gives home remedy recipes** 🍵  
+✔️ **Suggests medicines only if needed** 💊  
+✔️ **Supports mental health** 🧠  
+✔️ **Creates personalized health plans** 📋  
+✔️ **Learns from user experience** to improve recommendations 🔄  
+✔️ **Keeps users motivated & engaged** 😊  
+
+
 ### Key Highlights ✨
 - **Intelligent Documentation Management**: Organize, search, and manage documents with ease.
 - **Seamless Team Collaboration**: Real-time multi-user editing with advanced synchronization.
