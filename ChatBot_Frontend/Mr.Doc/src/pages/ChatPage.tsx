@@ -6,6 +6,7 @@ interface Message {
   id: number;
   text: string;
   isUser: boolean;
+  timestamp: Date;
 }
 
 interface ChatPageProps {
@@ -24,10 +25,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Retrieve token from local storage
   const token = localStorage.getItem('token');
 
-  // Fetch chat history on component mount
   useEffect(() => {
     const fetchChatHistory = async () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -49,12 +48,14 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           history.push({
             id: index * 2 + 1,
             text: item.input_text,
-            isUser: true
+            isUser: true,
+            timestamp: new Date(item.timestamp) // Assuming the timestamp is returned by the API
           });
           history.push({
             id: index * 2 + 2,
             text: item.response_text,
-            isUser: false
+            isUser: false,
+            timestamp: new Date(item.timestamp) // Assuming the timestamp is returned by the API
           });
         });
 
@@ -79,11 +80,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // Add user message
     const userMessage: Message = {
       id: messages.length + 1,
       text: input,
-      isUser: true
+      isUser: true,
+      timestamp: new Date()
     };
 
     setMessages([...messages, userMessage]);
@@ -106,26 +107,34 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
       const data = await response.json();
 
-      // Add bot response
       const botMessage: Message = {
         id: messages.length + 2,
         text: data.response_text,
-        isUser: false
+        isUser: false,
+        timestamp: new Date()
       };
 
       setMessages([...messages, userMessage, botMessage]);
     } catch (error) {
       console.error('Error:', error);
-      // Handle error response
       const errorMessage: Message = {
         id: messages.length + 2,
         text: 'An error occurred. Please try again later.',
-        isUser: false
+        isUser: false,
+        timestamp: new Date()
       };
       setMessages([...messages, userMessage, errorMessage]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString();
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString();
   };
 
   if (isLoading) {
@@ -151,19 +160,24 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                message.isUser
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white shadow-sm text-gray-900'
-              }`}
-            >
-              {message.text}
+        {messages.map((message, index) => (
+          <div key={message.id}>
+            {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
+              <div className="text-gray-500 text-center mb-4">
+                {formatDate(message.timestamp)}
+              </div>
+            ) : null}
+            <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                  message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
+                }`}
+              >
+                {message.text}
+                <div className="text-xs text-gray-500 mt-1">
+                  {formatTime(message.timestamp)}
+                </div>
+              </div>
             </div>
           </div>
         ))}
