@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut } from 'lucide-react';
+import { Send, Bot, LogOut, Plus } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -7,6 +7,8 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  imageUrl?: string;
+  comment?: string;
 }
 
 interface ChatPageProps {
@@ -18,6 +20,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [comment, setComment] = useState("");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -78,17 +82,21 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !selectedImage) return;
 
     const userMessage: Message = {
       id: messages.length + 1,
       text: input,
       isUser: true,
-      timestamp: new Date()
+      timestamp: new Date(),
+      imageUrl: selectedImage ? URL.createObjectURL(selectedImage) : undefined,
+      comment: comment || undefined
     };
 
     setMessages([...messages, userMessage]);
     setInput("");
+    setSelectedImage(null);
+    setComment("");
     setLoading(true);
 
     try {
@@ -126,6 +134,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       setMessages([...messages, userMessage, errorMessage]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedImage(event.target.files[0]);
     }
   };
 
@@ -174,6 +188,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 }`}
               >
                 {message.text}
+                {message.imageUrl && (
+                  <div className="mt-2">
+                    <img src={message.imageUrl} alt="Uploaded" className="max-w-full h-auto rounded-lg" />
+                    {message.comment && <p className="mt-1 text-gray-500">{message.comment}</p>}
+                  </div>
+                )}
                 <div className="text-xs text-gray-500 mt-1">
                   {formatTime(message.timestamp)}
                 </div>
@@ -194,6 +214,16 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       <form onSubmit={handleSend} className="p-4 bg-white border-t">
         <div className="max-w-7xl mx-auto flex gap-4">
           <input
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="image-upload"
+            onChange={handleImageUpload}
+          />
+          <label htmlFor="image-upload">
+            <Plus className="icon-button" /> {/* Add the + icon */}
+          </label>
+          <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -209,6 +239,17 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           </button>
         </div>
       </form>
+      {selectedImage && (
+        <div className="comment-container p-4 bg-white border-t">
+          <input
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+      )}
     </div>
   );
 };
