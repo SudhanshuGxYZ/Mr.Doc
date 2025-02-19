@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut } from 'lucide-react';
+import { Send, Bot, LogOut, MoreVertical, Trash } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -18,6 +18,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -137,6 +138,23 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     return date.toLocaleTimeString();
   };
 
+  const handleSelectMessage = (id: number) => {
+    setSelectedMessages(prev => {
+      const newSelectedMessages = new Set(prev);
+      if (newSelectedMessages.has(id)) {
+        newSelectedMessages.delete(id);
+      } else {
+        newSelectedMessages.add(id);
+      }
+      return newSelectedMessages;
+    });
+  };
+
+  const handleDeleteSelected = () => {
+    setMessages(messages.filter(message => !selectedMessages.has(message.id)));
+    setSelectedMessages(new Set());
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -161,7 +179,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => (
-          <div key={message.id}>
+          <div key={message.id} className={`relative ${selectedMessages.has(message.id) ? 'bg-gray-200' : ''} transition-all duration-300`}>
             {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
               <div className="text-gray-500 text-center mb-4">
                 {formatDate(message.timestamp)}
@@ -169,9 +187,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             ) : null}
             <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                  message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
-                }`}
+                className={`max-w-[80%] rounded-lg px-4 py-2 ${message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'}`}
               >
                 {message.text}
                 <div className="text-xs text-gray-500 mt-1">
@@ -179,6 +195,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 </div>
               </div>
             </div>
+            <input
+              type="checkbox"
+              className="absolute top-2 left-2"
+              checked={selectedMessages.has(message.id)}
+              onChange={() => handleSelectMessage(message.id)}
+            />
           </div>
         ))}
         {loading && (
@@ -207,6 +229,24 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           >
             <Send className="h-5 w-5" />
           </button>
+          <div className="relative">
+            <button
+              type="button"
+              className="bg-gray-200 text-gray-600 rounded-lg px-4 py-2 hover:bg-gray-300 transition-colors"
+            >
+              <MoreVertical className="h-5 w-5" />
+            </button>
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
+              <button
+                type="button"
+                className="flex items-center px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={handleDeleteSelected}
+              >
+                <Trash className="h-5 w-5 mr-2" />
+                Delete Selected
+              </button>
+            </div>
+          </div>
         </div>
       </form>
     </div>
