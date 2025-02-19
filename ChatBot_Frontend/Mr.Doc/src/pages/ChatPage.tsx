@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut } from 'lucide-react';
+import { Send, Bot, LogOut, Upload, Trash2 } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -213,7 +213,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
-          <div key={message.id} onClick={() => handleSelectMessage(message.id)}>
+          <div key={message.id} onClick={() => handleSelectMessage(message.id)} className={`transition-transform transform ${selectedMessages.has(message.id) ? 'scale-105' : ''}`}>
             {message.text && (
               <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
                 <div
@@ -270,16 +270,18 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
+            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors flex items-center"
           >
+            <Upload className="h-5 w-5 mr-2" />
             Upload
           </button>
           <button
             type="submit"
-            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
+            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors flex items-center"
             disabled={loading}
           >
-            <Send className="h-5 w-5" />
+            <Send className="h-5 w-5 mr-2" />
+            Send
           </button>
         </div>
       </form>
@@ -287,8 +289,9 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       {selectedMessages.size > 0 && (
         <button
           onClick={handleDeleteMessages}
-          className="bg-red-600 text-white rounded-lg px-4 py-2 hover:bg-red-700 transition-colors"
+          className="bg-red-600 text-white rounded-lg px-4 py-2 hover:bg-red-700 transition-colors flex items-center mx-auto mt-4"
         >
+          <Trash2 className="h-5 w-5 mr-2" />
           Delete Selected
         </button>
       )}
