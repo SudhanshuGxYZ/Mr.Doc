@@ -17,7 +17,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(true);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -28,7 +29,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
-      setLoading(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
       try {
         const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/', {
@@ -49,13 +49,13 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             id: index * 2 + 1,
             text: item.input_text,
             isUser: true,
-            timestamp: new Date(item.timestamp)
+            timestamp: new Date(item.timestamp) // Assuming the timestamp is returned by the API
           });
           history.push({
             id: index * 2 + 2,
             text: item.response_text,
             isUser: false,
-            timestamp: new Date(item.timestamp)
+            timestamp: new Date(item.timestamp) // Assuming the timestamp is returned by the API
           });
         });
 
@@ -64,24 +64,21 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       } catch (error) {
         console.error('Error:', error);
       }
-      setLoading(false);
+      setIsLoading(false);
     };
 
-    if (token) {
-      fetchChatHistory();
-    }
+    fetchChatHistory();
   }, [token]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (!isLoading) {
+      scrollToBottom();
+    }
+  }, [messages, isLoading]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) {
-      alert("Input cannot be empty");
-      return;
-    }
+    if (!input.trim()) return;
 
     const userMessage: Message = {
       id: messages.length + 1,
@@ -140,7 +137,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     return date.toLocaleTimeString();
   };
 
-  if (loading) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
