@@ -19,6 +19,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
+  const [showDeleteOptions, setShowDeleteOptions] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -151,8 +152,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   };
 
   const handleDeleteSelected = () => {
-    setMessages(messages.filter(message => !selectedMessages.has(message.id)));
-    setSelectedMessages(new Set());
+    if (showDeleteOptions) {
+      setMessages(messages.filter(message => !selectedMessages.has(message.id)));
+      setSelectedMessages(new Set());
+    }
+    setShowDeleteOptions(!showDeleteOptions);
   };
 
   if (isLoading) {
@@ -195,12 +199,14 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 </div>
               </div>
             </div>
-            <input
-              type="checkbox"
-              className="absolute top-2 left-2"
-              checked={selectedMessages.has(message.id)}
-              onChange={() => handleSelectMessage(message.id)}
-            />
+            {showDeleteOptions && (
+              <input
+                type="checkbox"
+                className="absolute top-2 left-2"
+                checked={selectedMessages.has(message.id)}
+                onChange={() => handleSelectMessage(message.id)}
+              />
+            )}
           </div>
         ))}
         {loading && (
@@ -233,19 +239,22 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             <button
               type="button"
               className="bg-gray-200 text-gray-600 rounded-lg px-4 py-2 hover:bg-gray-300 transition-colors"
+              onClick={handleDeleteSelected}
             >
               <MoreVertical className="h-5 w-5" />
             </button>
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
-              <button
-                type="button"
-                className="flex items-center px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100 transition-colors"
-                onClick={handleDeleteSelected}
-              >
-                <Trash className="h-5 w-5 mr-2" />
-                Delete Selected
-              </button>
-            </div>
+            {showDeleteOptions && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
+                <button
+                  type="button"
+                  className="flex items-center px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100 transition-colors"
+                  onClick={handleDeleteSelected}
+                >
+                  <Trash className="h-5 w-5 mr-2" />
+                  Delete Selected
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </form>
