@@ -28,11 +28,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    // Log out the user if the page is refreshed
-    onLogout();
-  }, []);
+    // Check if token exists and is valid, otherwise redirect to login page
+    if (!token) {
+      onLogout();
+      return;
+    }
 
-  useEffect(() => {
     const fetchChatHistory = async () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       try {
@@ -41,11 +42,14 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             'Authorization': `Token ${token}`
           }
         });
-        if (!token) {
-          onLogout();
-        }
 
         if (!response.ok) {
+          if (response.status === 401) {
+            // Unauthorized, clear token and redirect to login
+            localStorage.removeItem('token');
+            onLogout();
+            return;
+          }
           throw new Error('Failed to fetch chat history');
         }
 
@@ -76,7 +80,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     };
 
     fetchChatHistory();
-  }, [token]);
+  }, [token, onLogout]);
 
   useEffect(() => {
     if (!isLoading) {
