@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut, Upload, Trash2 } from 'lucide-react';
+import { Send, Bot, LogOut } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
   id: number;
-  text?: string;
-  imageUrl?: string;
-  documentUrl?: string;
+  text: string;
   isUser: boolean;
   timestamp: Date;
 }
@@ -20,8 +18,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -133,54 +129,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-  
-    const formData = new FormData();
-    formData.append('file', file);
-  
-    try {
-      const response = await fetch('https://your-upload-endpoint.com/upload', {
-        method: 'POST',
-        body: formData,
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to upload file');
-      }
-  
-      const data = await response.json();
-      const fileMessage: Message = {
-        id: messages.length + 1,
-        imageUrl: data.imageUrl, // or documentUrl: data.documentUrl
-        isUser: true,
-        timestamp: new Date(),
-      };
-  
-      setMessages([...messages, fileMessage]);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
-  const handleSelectMessage = (id: number) => {
-    setSelectedMessages((prev) => {
-      const newSelected = new Set(prev);
-      if (newSelected.has(id)) {
-        newSelected.delete(id);
-      } else {
-        newSelected.add(id);
-      }
-      return newSelected;
-    });
-  };
-  
-  const handleDeleteMessages = () => {
-    setMessages((prev) => prev.filter((message) => !selectedMessages.has(message.id)));
-    setSelectedMessages(new Set());
-  };
-
   const formatDate = (date: Date) => {
     return date.toLocaleDateString();
   };
@@ -212,34 +160,25 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div key={message.id} onClick={() => handleSelectMessage(message.id)} className={`transition-transform transform ${selectedMessages.has(message.id) ? 'scale-105' : ''}`}>
-            {message.text && (
-              <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                    message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
-                  }`}
-                >
-                  {message.text}
-                  <div className="text-xs text-gray-500 mt-1">
-                    {formatTime(message.timestamp)}
-                  </div>
+        {messages.map((message, index) => (
+          <div key={message.id}>
+            {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
+              <div className="text-gray-500 text-center mb-4">
+                {formatDate(message.timestamp)}
+              </div>
+            ) : null}
+            <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                  message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
+                }`}
+              >
+                {message.text}
+                <div className="text-xs text-gray-500 mt-1">
+                  {formatTime(message.timestamp)}
                 </div>
               </div>
-            )}
-            {message.imageUrl && (
-              <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                <img src={message.imageUrl} alt="Uploaded" className="max-w-[80%] rounded-lg" />
-              </div>
-            )}
-            {message.documentUrl && (
-              <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                <a href={message.documentUrl} target="_blank" rel="noopener noreferrer" className="max-w-[80%] rounded-lg px-4 py-2 bg-white shadow-sm text-gray-900">
-                  View Document
-                </a>
-              </div>
-            )}
+            </div>
           </div>
         ))}
         {loading && (
@@ -261,40 +200,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             placeholder="Type your message..."
             className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors flex items-center"
-          >
-            <Upload className="h-5 w-5 mr-2" />
-            Upload
-          </button>
           <button
             type="submit"
-            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors flex items-center"
+            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
             disabled={loading}
           >
-            <Send className="h-5 w-5 mr-2" />
-            Send
+            <Send className="h-5 w-5" />
           </button>
         </div>
       </form>
-
-      {selectedMessages.size > 0 && (
-        <button
-          onClick={handleDeleteMessages}
-          className="bg-red-600 text-white rounded-lg px-4 py-2 hover:bg-red-700 transition-colors flex items-center mx-auto mt-4"
-        >
-          <Trash2 className="h-5 w-5 mr-2" />
-          Delete Selected
-        </button>
-      )}
     </div>
   );
 };
