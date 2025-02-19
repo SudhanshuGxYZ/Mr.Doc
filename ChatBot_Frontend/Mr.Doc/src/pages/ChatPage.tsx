@@ -36,6 +36,10 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             'Authorization': `Token ${token}`
           }
         });
+        if(!Token){
+          onLogout();
+        }
+          
 
         if (!response.ok) {
           throw new Error('Failed to fetch chat history');
