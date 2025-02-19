@@ -28,6 +28,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
+    // Log out the user if the page is refreshed
+    onLogout();
+  }, []);
+
+  useEffect(() => {
     const fetchChatHistory = async () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       try {
@@ -36,10 +41,9 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             'Authorization': `Token ${token}`
           }
         });
-        if(!Token){
+        if (!token) {
           onLogout();
         }
-          
 
         if (!response.ok) {
           throw new Error('Failed to fetch chat history');
