@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut, MoreVertical } from 'lucide-react'; // Import MoreVertical icon
+import { Send, Bot, LogOut } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
-import CopyMessageMenu from '../components/CopyMessageMenu'; // Import CopyMessageMenu component
 
 interface Message {
   id: number;
@@ -19,9 +18,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set()); // Track selected messages
-  const [showMenu, setShowMenu] = useState(false); // Track menu visibility
-  const [menuMessage, setMenuMessage] = useState<string | null>(null); // Track message for copy menu
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -153,29 +149,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     return date.toLocaleTimeString();
   };
 
-  const handleLongPress = (id: number) => {
-    setSelectedMessages(prev => {
-      const newSelectedMessages = new Set(prev);
-      if (newSelectedMessages.has(id)) {
-        newSelectedMessages.delete(id);
-      } else {
-        newSelectedMessages.add(id);
-      }
-      return newSelectedMessages;
-    });
-  };
-
-  const handleDelete = () => {
-    setMessages(prev => prev.filter(message => !selectedMessages.has(message.id)));
-    setSelectedMessages(new Set());
-    setShowMenu(false);
-  };
-
-  const handleShowMenu = (message: string) => {
-    setMenuMessage(message);
-    setShowMenu(true);
-  };
-
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -188,33 +161,19 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             <Bot className="h-6 w-6 text-indigo-600" />
             <span className="ml-2 font-semibold text-gray-900">Chat Assistant</span>
           </div>
-          <div className="flex items-center">
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              <MoreVertical className="h-5 w-5" />
-            </button>
-            {showMenu && menuMessage && (
-              <CopyMessageMenu
-                message={menuMessage}
-                onCopy={() => setShowMenu(false)}
-              />
-            )}
-            <button
-              onClick={onLogout}
-              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors ml-2"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="ml-2">Logout</span>
-            </button>
-          </div>
+          <button
+            onClick={onLogout}
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="ml-2">Logout</span>
+          </button>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => (
-          <div key={message.id} onContextMenu={(e) => { e.preventDefault(); handleLongPress(message.id); }}>
+          <div key={message.id}>
             {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
               <div className="text-gray-500 text-center mb-4">
                 {formatDate(message.timestamp)}
@@ -224,8 +183,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
               <div
                 className={`max-w-[80%] rounded-lg px-4 py-2 ${
                   message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
-                } ${selectedMessages.has(message.id) ? 'bg-gray-300' : ''}`} // Add highlight for selected messages
-                onClick={() => handleShowMenu(message.text)} // Show menu on click
+                }`}
               >
                 {message.text}
                 <div className="text-xs text-gray-500 mt-1">
