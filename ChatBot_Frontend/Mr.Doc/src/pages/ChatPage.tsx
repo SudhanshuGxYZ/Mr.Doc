@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, LogOut, MoreVertical } from 'lucide-react'; // Import MoreVertical icon
 import LoadingSpinner from '../components/LoadingSpinner';
+import CopyMessageMenu from '../components/CopyMessageMenu'; // Import CopyMessageMenu component
 
 interface Message {
   id: number;
@@ -20,6 +21,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set()); // Track selected messages
   const [showMenu, setShowMenu] = useState(false); // Track menu visibility
+  const [menuMessage, setMenuMessage] = useState<string | null>(null); // Track message for copy menu
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -169,6 +171,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     setShowMenu(false);
   };
 
+  const handleShowMenu = (message: string) => {
+    setMenuMessage(message);
+    setShowMenu(true);
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -188,22 +195,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             >
               <MoreVertical className="h-5 w-5" />
             </button>
-            {showMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg">
-                <button
-                  onClick={handleDelete}
-                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                >
-                  Delete
-                </button>
-                <button
-                  onClick={() => setShowMenu(false)}
-                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                >
-                  Select
-                </button>
-                {/* Add more menu options here */}
-              </div>
+            {showMenu && menuMessage && (
+              <CopyMessageMenu
+                message={menuMessage}
+                onCopy={() => setShowMenu(false)}
+              />
             )}
             <button
               onClick={onLogout}
@@ -229,6 +225,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 className={`max-w-[80%] rounded-lg px-4 py-2 ${
                   message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
                 } ${selectedMessages.has(message.id) ? 'bg-gray-300' : ''}`} // Add highlight for selected messages
+                onClick={() => handleShowMenu(message.text)} // Show menu on click
               >
                 {message.text}
                 <div className="text-xs text-gray-500 mt-1">
