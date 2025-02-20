@@ -196,6 +196,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 >
                   Delete
                 </button>
+                <button
+                  onClick={() => setShowMenu(false)}
+                  className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                >
+                  Select
+                </button>
                 {/* Add more menu options here */}
               </div>
             )}
