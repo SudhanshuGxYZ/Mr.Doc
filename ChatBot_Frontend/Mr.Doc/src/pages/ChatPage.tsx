@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut } from 'lucide-react';
+import { Send, Bot, LogOut, Trash2 } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -26,6 +26,10 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   };
 
   const token = localStorage.getItem('token');
+
+  const handleDelete = (id: number) => {
+  setMessages(messages.filter(message => message.id !== id));
+};
 
   useEffect(() => {
     // Check if token exists and is valid, otherwise redirect to login page
@@ -149,80 +153,89 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     return date.toLocaleTimeString();
   };
 
+  const handleDelete = (id: number) => {
+  setMessages(messages.filter(message => message.id !== id));
+};
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <Bot className="h-6 w-6 text-indigo-600" />
-            <span className="ml-2 font-semibold text-gray-900">Chat Assistant</span>
-          </div>
-          <button
-            onClick={onLogout}
-            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            <LogOut className="h-5 w-5" />
-            <span className="ml-2">Logout</span>
-          </button>
+  <div className="flex flex-col h-screen bg-gray-50">
+    <div className="bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <Bot className="h-6 w-6 text-indigo-600" />
+          <span className="ml-2 font-semibold text-gray-900">Chat Assistant</span>
         </div>
+        <button
+          onClick={onLogout}
+          className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+        >
+          <LogOut className="h-5 w-5" />
+          <span className="ml-2">Logout</span>
+        </button>
       </div>
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message, index) => (
-          <div key={message.id}>
-            {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
-              <div className="text-gray-500 text-center mb-4">
-                {formatDate(message.timestamp)}
-              </div>
-            ) : null}
-            <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                  message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
-                }`}
-              >
-                {message.text}
-                <div className="text-xs text-gray-500 mt-1">
-                  {formatTime(message.timestamp)}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg px-4 py-2 bg-white shadow-sm text-gray-900">
-              <Bot className="h-5 w-5 text-indigo-600 animate-bounce" />
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      <form onSubmit={handleSend} className="p-4 bg-white border-t">
-        <div className="max-w-7xl mx-auto flex gap-4">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <button
-            type="submit"
-            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
-            disabled={loading}
-          >
-            <Send className="h-5 w-5" />
-          </button>
-        </div>
-      </form>
     </div>
-  );
-};
+
+    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {messages.map((message, index) => (
+        <div key={message.id} className="flex items-center">
+          {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
+            <div className="text-gray-500 text-center mb-4">
+              {formatDate(message.timestamp)}
+            </div>
+          ) : null}
+          <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} w-full`}>
+            <div
+              className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
+              } flex items-center`}
+            >
+              {message.text}
+              <div className="text-xs text-gray-500 mt-1">
+                {formatTime(message.timestamp)}
+              </div>
+              <button
+                onClick={() => handleDelete(message.id)}
+                className="ml-2 text-red-600 hover:text-red-800 transition-colors"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+      {loading && (
+        <div className="flex justify-start">
+          <div className="max-w-[80%] rounded-lg px-4 py-2 bg-white shadow-sm text-gray-900">
+            <Bot className="h-5 w-5 text-indigo-600 animate-bounce" />
+          </div>
+        </div>
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+
+    <form onSubmit={handleSend} className="p-4 bg-white border-t">
+      <div className="max-w-7xl mx-auto flex gap-4">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your message..."
+          className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <button
+          type="submit"
+          className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
+          disabled={loading}
+        >
+          <Send className="h-5 w-5" />
+        </button>
+      </div>
+    </form>
+  </div>
+);
 
 export default ChatPage;
