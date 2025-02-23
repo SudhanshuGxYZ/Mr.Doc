@@ -88,3 +88,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   }, [token, onLogout, history]);
 
   // Rest of your code remains unchanged
+  // ...
+
+  return (
+    // JSX code remains unchanged
+  );
+};
+
+export default ChatPage;
