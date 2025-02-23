@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut } from 'lucide-react';
+import { Send, Bot, LogOut, ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -18,6 +18,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -161,13 +162,26 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             <Bot className="h-6 w-6 text-indigo-600" />
             <span className="ml-2 font-semibold text-gray-900">Chat Assistant</span>
           </div>
-          <button
-            onClick={onLogout}
-            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            <LogOut className="h-5 w-5" />
-            <span className="ml-2">Logout</span>
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <span className="ml-2">Options</span>
+              <ChevronDown className="ml-2 h-5 w-5" />
+            </button>
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
+                <button
+                  onClick={onLogout}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  <LogOut className="h-5 w-5 inline-block mr-2" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
