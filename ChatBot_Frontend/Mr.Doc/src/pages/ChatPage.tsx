@@ -27,7 +27,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   };
 
   const token = localStorage.getItem('token');
-  const username = localStorage.getItem('username'); // Fetch the username
 
   useEffect(() => {
     // Check if token exists and is valid, otherwise redirect to login page
@@ -156,7 +155,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-150">
+    <div className="flex flex-col h-screen bg-gray-50">
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
@@ -164,17 +163,28 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             <span className="ml-2 font-semibold text-gray-900">Chat Assistant</span>
           </div>
           <div className="relative">
-           <button onClick={() => setDropdownOpen(!dropdownOpen)}>
-          </button>
-            <div className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg ${dropdownOpen ? 'dropdown-enter' : 'dropdown-exit'}`}>
-              <button
-                onClick={onLogout}
-                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-              >
-                <LogOut className="h-5 w-5 inline-block mr-2" />
-                Logout
-              </button>
-            </div>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <span className="ml-2">Options</span>
+              {dropdownOpen ? (
+                <ChevronUp className="ml-2 h-5 w-5 transition-transform transform rotate-180" />
+              ) : (
+                <ChevronDown className="ml-2 h-5 w-5 transition-transform transform rotate-0" />
+              )}
+            </button>
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
+                <button
+                  onClick={onLogout}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  <LogOut className="h-5 w-5 inline-block mr-2" />
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
