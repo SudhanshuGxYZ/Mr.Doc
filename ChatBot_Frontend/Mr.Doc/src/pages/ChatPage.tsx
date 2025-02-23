@@ -178,7 +178,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
             <Bot className="h-6 w-6 text-indigo-600" />
-            <span className="ml-2 font-semibold text-gray-900">Mr.Doc Ur Medical Ai Assistance</span>
+            <span className="ml-2 font-semibold text-gray-900">Mr.Doc </span>
           </div>
           <div className="relative" ref={dropdownRef}>
             <button
