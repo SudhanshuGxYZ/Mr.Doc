@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut, ChevronDown, ChevronUp } from 'lucide-react'; // Updated import
+import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare } from 'lucide-react'; // Updated import
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -179,16 +179,19 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
+                  <CheckSquare className="h-5 w-5 inline-block mr-2" />
                   Select
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
+                  <Clipboard className="h-5 w-5 inline-block mr-2" />
                   Copy
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
+                  <Trash className="h-5 w-5 inline-block mr-2" />
                   Delete
                 </button>
                 <button
