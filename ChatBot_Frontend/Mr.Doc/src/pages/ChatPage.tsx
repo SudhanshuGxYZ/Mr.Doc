@@ -247,7 +247,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
         {messages.map((message, index) => (
           <div
             key={message.id}
-            className={`${selectedMessages.has(message.id) ? 'bg-gray-300 p-3' : ''}`}
+            className={`${selectedMessages.has(message.id) ? 'bg-gray-300 p-2' : ''}`}
             onClick={() => handleChatClick(message.id)}
           >
             {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
