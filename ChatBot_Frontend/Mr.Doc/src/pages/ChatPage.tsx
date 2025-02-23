@@ -21,6 +21,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -89,6 +90,24 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       scrollToBottom();
     }
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,7 +182,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             <Bot className="h-6 w-6 text-indigo-600" />
             <span className="ml-2 font-semibold text-gray-900">Chat Assistant</span>
           </div>
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
