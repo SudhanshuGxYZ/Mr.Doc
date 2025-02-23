@@ -177,6 +177,21 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
                 <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Select
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Copy
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Delete
+                </button>
+                <button
                   onClick={onLogout}
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
