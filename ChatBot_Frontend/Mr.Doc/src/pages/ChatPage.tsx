@@ -165,16 +165,16 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           </div>
           <div className="relative">
             <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              <span className="ml-2">{username || 'User'}</span>
-              {dropdownOpen ? (
-                <ChevronUp className="ml-2 h-5 w-5 transition-transform transform rotate-180" />
-              ) : (
-                <ChevronDown className="ml-2 h-5 w-5 transition-transform transform rotate-0" />
-              )}
-            </button>
+  onClick={() => setDropdownOpen(!dropdownOpen)}
+  className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+>
+  <span className="ml-2">{username || 'User'}</span>
+  {dropdownOpen ? (
+    <ChevronUp className="ml-2 h-5 w-5 transition-transform transform rotate-180" />
+  ) : (
+    <ChevronDown className="ml-2 h-5 w-5 transition-transform transform rotate-0" />
+  )}
+</button>
             <div className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg ${dropdownOpen ? 'dropdown-enter' : 'dropdown-exit'}`}>
               <button
                 onClick={onLogout}
