@@ -164,6 +164,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   };
 
   const handleChatClick = (id: number) => {
+    if (!selectionMode) return;
     setSelectedMessages(prev => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
