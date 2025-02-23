@@ -98,12 +98,10 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       }
     };
 
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
+    // Add event listener
+    document.addEventListener('mousedown', handleClickOutside);
 
+    // Clean up event listener
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
