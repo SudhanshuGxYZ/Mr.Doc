@@ -165,9 +165,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           </div>
           <div className="relative">
            <button onClick={() => setDropdownOpen(!dropdownOpen)}>
-  {dropdownOpen ? <ChevronUp /> : <ChevronDown />}
-</button>
-</button>
+          </button>
             <div className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg ${dropdownOpen ? 'dropdown-enter' : 'dropdown-exit'}`}>
               <button
                 onClick={onLogout}
