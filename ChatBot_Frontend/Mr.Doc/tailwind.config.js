@@ -2,7 +2,17 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      transitionProperty: {
+        'height': 'height',
+      },
+      transform: ['group-hover'],
+    },
+  },
+  variants: {
+    extend: {
+      rotate: ['group-hover'],
+    },
   },
   plugins: [],
 };
