@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User } from 'lucide-react'; // Updated import
+import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -19,6 +19,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -28,10 +30,9 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   };
 
   const token = localStorage.getItem('token');
-  const username = localStorage.getItem('username'); // Get the username
+  const username = localStorage.getItem('username');
 
   useEffect(() => {
-    // Check if token exists and is valid, otherwise redirect to login page
     if (!token) {
       onLogout();
       return;
@@ -48,7 +49,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
         if (!response.ok) {
           if (response.status === 401) {
-            // Unauthorized, clear token and redirect to login
             localStorage.removeItem('token');
             onLogout();
             return;
@@ -64,13 +64,13 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             id: index * 2 + 1,
             text: item.input_text,
             isUser: true,
-            timestamp: new Date(item.timestamp) // Assuming the timestamp is returned by the API
+            timestamp: new Date(item.timestamp)
           });
           history.push({
             id: index * 2 + 2,
             text: item.response_text,
             isUser: false,
-            timestamp: new Date(item.timestamp) // Assuming the timestamp is returned by the API
+            timestamp: new Date(item.timestamp)
           });
         });
 
@@ -98,10 +98,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       }
     };
 
-    // Add event listener
     document.addEventListener('mousedown', handleClickOutside);
 
-    // Clean up event listener
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -160,6 +158,23 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     }
   };
 
+  const handleSelectClick = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedMessages(new Set());
+  };
+
+  const handleCheckboxChange = (id: number) => {
+    setSelectedMessages(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString();
   };
@@ -185,8 +200,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
             >
-              <User className="h-5 w-5 mr-2" /> {/* Add the User icon here */}
-              <span className="ml-2">{username ? username : 'Options'}</span> {/* Display username */}
+              <User className="h-5 w-5 mr-2" />
+              <span className="ml-2">{username ? username : 'Options'}</span>
               {dropdownOpen ? (
                 <ChevronUp className="ml-2 h-5 w-5 transition-transform transform rotate-180" />
               ) : (
@@ -197,6 +212,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={handleSelectClick}
                 >
                   <CheckSquare className="h-5 w-5 inline-block mr-2" />
                   Select
@@ -228,13 +244,21 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => (
-          <div key={message.id}>
+          <div key={message.id} className={`${selectedMessages.has(message.id) ? 'bg-gray-300' : ''}`}>
             {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
               <div className="text-gray-500 text-center mb-4">
                 {formatDate(message.timestamp)}
               </div>
             ) : null}
             <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+              {selectionMode && (
+                <input
+                  type="checkbox"
+                  checked={selectedMessages.has(message.id)}
+                  onChange={() => handleCheckboxChange(message.id)}
+                  className={`self-center ${message.isUser ? 'order-1 mr-2' : 'order-0 ml-2'}`}
+                />
+              )}
               <div
                 className={`max-w-[80%] rounded-lg px-4 py-2 ${
                   message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
