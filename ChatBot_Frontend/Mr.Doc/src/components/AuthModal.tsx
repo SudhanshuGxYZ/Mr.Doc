@@ -50,6 +50,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     const data = await response.json();
 
     localStorage.setItem('token', data.token);
+    localStorage.setItem('username', username); // Store the username
 
     if (!isLogin) {
       setLoading(false);
