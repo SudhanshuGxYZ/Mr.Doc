@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare } from 'lucide-react'; // Updated import
+import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User } from 'lucide-react'; // Updated import
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -168,6 +168,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
             >
+              <User className="h-5 w-5 mr-2" /> {/* Add the User icon here */}
               <span className="ml-2">{username ? username : 'Options'}</span> {/* Display username */}
               {dropdownOpen ? (
                 <ChevronUp className="ml-2 h-5 w-5 transition-transform transform rotate-180" />
