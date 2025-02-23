@@ -175,17 +175,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 <ChevronDown className="ml-2 h-5 w-5 transition-transform transform rotate-0" />
               )}
             </button>
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
-                <button
-                  onClick={onLogout}
-                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  <LogOut className="h-5 w-5 inline-block mr-2" />
-                  Logout
-                </button>
-              </div>
-            )}
+            <div className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg ${dropdownOpen ? 'dropdown-enter' : 'dropdown-exit'}`}>
+              <button
+                onClick={onLogout}
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                <LogOut className="h-5 w-5 inline-block mr-2" />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
