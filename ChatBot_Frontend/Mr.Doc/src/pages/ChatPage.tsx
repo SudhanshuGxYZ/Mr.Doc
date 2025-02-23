@@ -27,6 +27,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   };
 
   const token = localStorage.getItem('token');
+  const username = localStorage.getItem('username'); // Fetch the username
 
   useEffect(() => {
     // Check if token exists and is valid, otherwise redirect to login page
@@ -167,7 +168,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
             >
-              <span className="ml-2">Options</span>
+              <span className="ml-2">{username || 'User'}</span>
               {dropdownOpen ? (
                 <ChevronUp className="ml-2 h-5 w-5 transition-transform transform rotate-180" />
               ) : (
