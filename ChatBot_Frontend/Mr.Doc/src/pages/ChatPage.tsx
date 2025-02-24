@@ -106,6 +106,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     };
   }, [dropdownOpen]);
 
+  useEffect(() => {
+    if (popupMessage) {
+      const timer = setTimeout(() => {
+        setPopupMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [popupMessage]);
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
