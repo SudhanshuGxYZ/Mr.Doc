@@ -188,6 +188,26 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     setPopupMessage(`${selectedMessages.size} message(s) deleted.`);
   };
 
+  const handleCopyClick = async () => {
+    if (selectedMessages.size === 0) {
+      setPopupMessage("Please select messages to copy.");
+      return;
+    }
+
+    const selectedText = Array.from(selectedMessages).map(id => {
+      const message = messages.find(msg => msg.id === id);
+      return message ? message.text : "";
+    }).join("\n");
+
+    try {
+      await navigator.clipboard.writeText(selectedText);
+      setPopupMessage(`${selectedMessages.size} message(s) copied to clipboard.`);
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      setPopupMessage('Failed to copy messages to clipboard.');
+    }
+  };
+
   const closePopup = () => {
     setPopupMessage(null);
   };
@@ -236,6 +256,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={handleCopyClick}
                 >
                   <Clipboard className="h-5 w-5 inline-block mr-2" />
                   Copy
