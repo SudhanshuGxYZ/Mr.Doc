@@ -235,7 +235,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-150">
-      <div className="bg-blue shadow-sm">
+      <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
             <Bot className="h-8 w-8 text-indigo-600" />
