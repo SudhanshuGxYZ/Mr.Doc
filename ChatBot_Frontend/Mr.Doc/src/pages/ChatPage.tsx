@@ -7,7 +7,6 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
-  deleted?: boolean;
 }
 
 interface ChatPageProps {
@@ -66,19 +65,17 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             id: index * 2 + 1,
             text: item.input_text,
             isUser: true,
-            timestamp: new Date(item.timestamp),
-            deleted: item.deleted || false
+            timestamp: new Date(item.timestamp)
           });
           history.push({
             id: index * 2 + 2,
             text: item.response_text,
             isUser: false,
-            timestamp: new Date(item.timestamp),
-            deleted: item.deleted || false
+            timestamp: new Date(item.timestamp)
           });
         });
 
-        setMessages(history.filter(message => !message.deleted));
+        setMessages(history);
         scrollToBottom();
       } catch (error) {
         console.error('Error:', error);
@@ -195,9 +192,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       return;
     }
 
-    setMessages(prevMessages => prevMessages.map(message =>
-      selectedMessages.has(message.id) ? { ...message, deleted: true } : message
-    ));
+    setMessages(prevMessages => prevMessages.filter(message => !selectedMessages.has(message.id)));
     setSelectedMessages(new Set());
     setPopupMessage(`${selectedMessages.size} message(s) deleted.`);
   };
