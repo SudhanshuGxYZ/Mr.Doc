@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
-import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User, Upload } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -7,7 +7,6 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
-  file?: File;
 }
 
 interface ChatPageProps {
@@ -17,15 +16,11 @@ interface ChatPageProps {
 const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [fileContent, setFileContent] = useState<string>("");
-  const [filePreview, setFilePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
-  const [popupMessage, setPopupMessage] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -110,99 +105,58 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     };
   }, [dropdownOpen]);
 
-  useEffect(() => {
-    if (popupMessage) {
-      const timer = setTimeout(() => {
-        setPopupMessage(null);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [popupMessage]);
-
-const handleSend = async (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() && !file) return;
+    if (!input.trim()) return;
 
     const userMessage: Message = {
-        id: messages.length + 1,
-        text: input,
-        isUser: true,
-        timestamp: new Date(),
-        file: file || undefined
+      id: messages.length + 1,
+      text: input,
+      isUser: true,
+      timestamp: new Date()
     };
 
     setMessages([...messages, userMessage]);
     setInput("");
-    setFile(null);
-    setFilePreview(null);
     setLoading(true);
 
     try {
-        const formData = new FormData();
-        formData.append('input_text', input);
-        
-        // Check if file exists before appending
-        if (file) {
-            formData.append('file', file);
-        }
+      const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input_text: input })
+      });
 
-        const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Token ${token}`
-            },
-            body: formData
-        });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+      const data = await response.json();
 
-        const data = await response.json();
+      const botMessage: Message = {
+        id: messages.length + 2,
+        text: data.response_text,
+        isUser: false,
+        timestamp: new Date()
+      };
 
-        const botMessage: Message = {
-            id: messages.length + 2,
-            text: data.response_text,
-            isUser: false,
-            timestamp: new Date()
-        };
-
-        setMessages([...messages, userMessage, botMessage]);
+      setMessages([...messages, userMessage, botMessage]);
     } catch (error) {
-        console.error('Error:', error);
-        setMessages([...messages, userMessage, {
-            id: messages.length + 2,
-            text: 'An error occurred. Please try again later.',
-            isUser: false,
-            timestamp: new Date()
-        }]);
+      console.error('Error:', error);
+      const errorMessage: Message = {
+        id: messages.length + 2,
+        text: 'An error occurred. Please try again later.',
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages([...messages, userMessage, errorMessage]);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
-const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-        const selectedFile = e.target.files[0];
-        setFile(selectedFile);
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const result = event.target?.result;
-            if (typeof result === 'string') {
-                setFileContent(result);
-            }
-            if (['image/jpeg', 'image/jpg', 'image/webp', 'image/png', 'image/svg+xml'].includes(selectedFile.type)) {
-                setFilePreview(result as string);
-            } else if (selectedFile.type === 'application/pdf') {
-                setFilePreview(result as string);
-            } else {
-                setFilePreview(null);
-            }
-        };
-        reader.readAsDataURL(selectedFile);
-    }
-};
+  };
 
   const handleSelectClick = () => {
     setSelectionMode(!selectionMode);
@@ -220,41 +174,6 @@ const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
       }
       return newSet;
     });
-  };
-
-  const handleDeleteClick = () => {
-    if (selectedMessages.size === 0) {
-      setPopupMessage("Please select messages to delete.");
-      return;
-    }
-
-    setMessages(prevMessages => prevMessages.filter(message => !selectedMessages.has(message.id)));
-    setSelectedMessages(new Set());
-    setPopupMessage(`${selectedMessages.size} message(s) deleted.`);
-  };
-
-  const handleCopyClick = async () => {
-    if (selectedMessages.size === 0) {
-      setPopupMessage("Please select messages to copy.");
-      return;
-    }
-
-    const selectedText = Array.from(selectedMessages).map(id => {
-      const message = messages.find(msg => msg.id === id);
-      return message ? message.text : "";
-    }).join("\n");
-
-    try {
-      await navigator.clipboard.writeText(selectedText);
-      setPopupMessage(`${selectedMessages.size} message(s) copied to clipboard.`);
-    } catch (error) {
-      console.error('Error copying to clipboard:', error);
-      setPopupMessage('Failed to copy messages to clipboard.');
-    }
-  };
-
-  const closePopup = () => {
-    setPopupMessage(null);
   };
 
   const formatDate = (date: Date) => {
@@ -301,14 +220,12 @@ const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={handleCopyClick}
                 >
                   <Clipboard className="h-5 w-5 inline-block mr-2" />
                   Copy
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={handleDeleteClick}
                 >
                   <Trash className="h-5 w-5 inline-block mr-2" />
                   Delete
@@ -365,15 +282,6 @@ const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
       <form onSubmit={handleSend} className="p-4 bg-white border-t">
         <div className="max-w-7xl mx-auto flex gap-4">
           <input
-            type="file"
-            onChange={handleFileChange}
-            className="hidden"
-            id="file-upload"
-          />
-          <label htmlFor="file-upload" className="bg-gray-200 text-gray-700 rounded-lg px-4 py-2 cursor-pointer hover:bg-gray-300 transition-colors">
-            <Upload className="h-5 w-5" />
-          </label>
-          <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -389,32 +297,6 @@ const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
           </button>
         </div>
       </form>
-
-      {file && (
-        <div className="p-4 bg-white border-t">
-          <h3 className="text-lg font-bold">File Preview:</h3>
-          {filePreview ? (
-            file.type.startsWith('image/') ? (
-              <img src={filePreview} alt="File Preview" className="rounded-lg" />
-            ) : file.type === 'application/pdf' ? (
-              <iframe src={filePreview} className="w-full h-72 rounded-lg" title="PDF Preview"></iframe>
-            ) : (
-              <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">{fileContent}</pre>
-            )
-          ) : (
-            <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">{fileContent}</pre>
-          )}
-        </div>
-      )}
-
-      {popupMessage && (
-        <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg">
-          {popupMessage}
-          <button onClick={closePopup} className="ml-4 text-red-500">
-            Close
-          </button>
-        </div>
-      )}
     </div>
   );
 };
