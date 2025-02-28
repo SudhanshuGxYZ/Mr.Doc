@@ -108,8 +108,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
         <div className="mt-12 text-center animate-fade-in-up animate-delay-500">
           <button
-{/*             onClick={handleStartChat} */}
-           onClick={() => onAuthClick(true)}
+            onClick={handleStartChat}
             className="inline-flex items-center px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all hover:scale-105 transform"
           >
             Let's Start Chatting
