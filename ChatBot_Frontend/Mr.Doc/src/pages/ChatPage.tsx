@@ -18,6 +18,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [fileContent, setFileContent] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -137,6 +138,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     try {
       const formData = new FormData();
       formData.append('input_text', input);
+      formData.append('file_content', fileContent); // Sending modified file content
       if (file) {
         formData.append('file', file);
       }
@@ -179,7 +181,14 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFileContent(event.target?.result as string);
+      };
+      reader.readAsText(selectedFile);
     }
   };
 
@@ -368,6 +377,19 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           </button>
         </div>
       </form>
+
+      {file && (
+        <div className="p-4 bg-white border-t">
+          <h3 className="text-lg font-bold">File Preview:</h3>
+          <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">{fileContent}</pre>
+          <textarea
+            value={fileContent}
+            onChange={(e) => setFileContent(e.target.value)}
+            rows={10}
+            className="w-full mt-4 p-2 border border-gray-300 rounded-lg"
+          />
+        </div>
+      )}
 
       {popupMessage && (
         <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg">
