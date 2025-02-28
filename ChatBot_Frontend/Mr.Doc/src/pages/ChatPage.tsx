@@ -119,7 +119,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     }
   }, [popupMessage]);
 
-  const handleSend = async (e: React.FormEvent) => {
+const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() && !file) return;
 
@@ -140,7 +140,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     try {
         const formData = new FormData();
         formData.append('input_text', input);
-        formData.append('file_content', fileContent); // Ensure this line is present
+        
+        // Check if file exists before appending
         if (file) {
             formData.append('file', file);
         }
@@ -169,13 +170,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
         setMessages([...messages, userMessage, botMessage]);
     } catch (error) {
         console.error('Error:', error);
-        const errorMessage: Message = {
+        setMessages([...messages, userMessage, {
             id: messages.length + 2,
             text: 'An error occurred. Please try again later.',
             isUser: false,
             timestamp: new Date()
-        };
-        setMessages([...messages, userMessage, errorMessage]);
+        }]);
     } finally {
         setLoading(false);
     }
