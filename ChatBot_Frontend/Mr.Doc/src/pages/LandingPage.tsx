@@ -46,7 +46,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={() => onAuthClick(false)}
                 className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
               >
-                ! Register !
+                 Register 
               </button>
             </div>
           </div>
@@ -56,7 +56,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center animate-fade-in-up">
           <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
-            Meet Mr.Doc, Your Personal AI Assistant
+            Meet Mr.Doc, Your Personal Medical Assistant !
           </h1>
           <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
             Experience the power of AI-driven conversations with Mr.Doc. Get instant responses, 
@@ -94,10 +94,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div>
               <h3 className="text-lg font-semibold text-yellow-800">Important Notice</h3>
               <div className="mt-2 text-yellow-700 space-y-2">
-                <p>Mr.Doc is designed to assist and provide general information with approximately 90% accuracy. Please note:</p>
+                <p>Mr.Doc is not a replacement for professional medical consultation it is just to help out from certain situations. Please note:</p>
                 <ul className="list-disc list-inside ml-4 space-y-1">
+                  <li>Mr.Doc is designed to assist and provide general information with approximately 90% accuracy</li>
                   <li>Always consult with healthcare professionals for medical advice</li>
-                  <li>Mr.Doc is not a replacement for professional medical consultation</li>
                   <li>Verify critical information with qualified medical practitioners</li>
                   <li>In case of emergency, contact emergency services immediately</li>
                 </ul>
