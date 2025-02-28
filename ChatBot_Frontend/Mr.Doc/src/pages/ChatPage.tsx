@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User } from 'lucide-react';
+import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User, Upload } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -7,6 +7,7 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  file?: File;
 }
 
 interface ChatPageProps {
@@ -21,6 +22,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
+  const [file, setFile] = useState<File | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -107,27 +109,34 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !file) return;
 
     const userMessage: Message = {
       id: messages.length + 1,
       text: input,
       isUser: true,
-      timestamp: new Date()
+      timestamp: new Date(),
+      file: file || undefined
     };
 
     setMessages([...messages, userMessage]);
     setInput("");
+    setFile(null);
     setLoading(true);
 
     try {
+      const formData = new FormData();
+      formData.append('input_text', input);
+      if (file) {
+        formData.append('file', file);
+      }
+
       const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
         method: 'POST',
         headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Token ${token}`
         },
-        body: JSON.stringify({ input_text: input })
+        body: formData
       });
 
       if (!response.ok) {
@@ -174,6 +183,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       }
       return newSet;
     });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -281,6 +296,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
       <form onSubmit={handleSend} className="p-4 bg-white border-t">
         <div className="max-w-7xl mx-auto flex gap-4">
+          <input
+            type="file"
+            onChange={handleFileChange}
+            className="hidden"
+            id="file-upload"
+          />
+          <label htmlFor="file-upload" className="bg-indigo-600 text-white rounded-lg px-4 py-2 cursor-pointer hover:bg-indigo-700 transition-colors">
+            <Upload className="h-5 w-5" />
+          </label>
           <input
             type="text"
             value={input}
