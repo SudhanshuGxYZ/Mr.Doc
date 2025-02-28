@@ -404,12 +404,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           ) : (
             <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">{fileContent}</pre>
           )}
-          <textarea
-            value={fileContent}
-            onChange={(e) => setFileContent(e.target.value)}
-            rows={10}
-            className="w-full mt-4 p-2 border border-gray-300 rounded-lg"
-          />
         </div>
       )}
 
