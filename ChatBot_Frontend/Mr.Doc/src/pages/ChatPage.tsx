@@ -124,11 +124,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     if (!input.trim() && !file) return;
 
     const userMessage: Message = {
-      id: messages.length + 1,
-      text: input,
-      isUser: true,
-      timestamp: new Date(),
-      file: file || undefined
+        id: messages.length + 1,
+        text: input,
+        isUser: true,
+        timestamp: new Date(),
+        file: file || undefined
     };
 
     setMessages([...messages, userMessage]);
@@ -138,48 +138,48 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('input_text', input);
-      formData.append('file_content', fileContent); // Sending modified file content
-      if (file) {
-        formData.append('file', file);
-      }
+        const formData = new FormData();
+        formData.append('input_text', input);
+        formData.append('file_content', fileContent); // Ensure this line is present
+        if (file) {
+            formData.append('file', file);
+        }
 
-      const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${token}`
-        },
-        body: formData
-      });
+        const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Token ${token}`
+            },
+            body: formData
+        });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
 
-      const data = await response.json();
+        const data = await response.json();
 
-      const botMessage: Message = {
-        id: messages.length + 2,
-        text: data.response_text,
-        isUser: false,
-        timestamp: new Date()
-      };
+        const botMessage: Message = {
+            id: messages.length + 2,
+            text: data.response_text,
+            isUser: false,
+            timestamp: new Date()
+        };
 
-      setMessages([...messages, userMessage, botMessage]);
+        setMessages([...messages, userMessage, botMessage]);
     } catch (error) {
-      console.error('Error:', error);
-      const errorMessage: Message = {
-        id: messages.length + 2,
-        text: 'An error occurred. Please try again later.',
-        isUser: false,
-        timestamp: new Date()
-      };
-      setMessages([...messages, userMessage, errorMessage]);
+        console.error('Error:', error);
+        const errorMessage: Message = {
+            id: messages.length + 2,
+            text: 'An error occurred. Please try again later.',
+            isUser: false,
+            timestamp: new Date()
+        };
+        setMessages([...messages, userMessage, errorMessage]);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
