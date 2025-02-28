@@ -134,7 +134,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                style={{ top: '60%', transform: 'translateY(-40%)' }} // Center the icon vertically
+                style={{ top: '65%', transform: 'translateY(-35%)' }} // Center the icon vertically
               >
                 {showPassword ? <EyeOff className="h-5 w-5 text-gray-500" /> : <Eye className="h-5 w-5 text-gray-500" />}
               </button>
