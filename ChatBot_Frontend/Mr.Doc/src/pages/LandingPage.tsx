@@ -1,198 +1,368 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Bot, MessageSquare, Users, Shield, ArrowRight, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User } from 'lucide-react';
+import LoadingSpinner from '../components/LoadingSpinner';
 
-interface LandingPageProps {
-  onAuthClick: (isLogin: boolean) => void;
-  isAuthenticated: boolean;
-  onPageTransition: () => void;
+interface Message {
+  id: number;
+  text: string;
+  isUser: boolean;
+  timestamp: Date;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ 
-  onAuthClick, 
-  isAuthenticated,
-  onPageTransition 
-}) => {
-  const navigate = useNavigate();
+interface ChatPageProps {
+  onLogout: () => void;
+}
 
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      onPageTransition();
-      navigate('/chat');
-    }
-  }, [isAuthenticated, navigate, onPageTransition]);
+const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
+  const [popupMessage, setPopupMessage] = useState<string | null>(null);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
-  const handleStartChat = () => {
-    onAuthClick(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const token = localStorage.getItem('token');
+  const username = localStorage.getItem('username');
+
+  useEffect(() => {
+    if (!token) {
+      onLogout();
+      return;
+    }
+
+    const fetchChatHistory = async () => {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      try {
+        const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/', {
+          headers: {
+            'Authorization': `Token ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.removeItem('token');
+            onLogout();
+            return;
+          }
+          throw new Error('Failed to fetch chat history');
+        }
+
+        const data = await response.json();
+        const history: Message[] = [];
+
+        data.forEach((item: any, index: number) => {
+          history.push({
+            id: index * 2 + 1,
+            text: item.input_text,
+            isUser: true,
+            timestamp: new Date(item.timestamp)
+          });
+          history.push({
+            id: index * 2 + 2,
+            text: item.response_text,
+            isUser: false,
+            timestamp: new Date(item.timestamp)
+          });
+        });
+
+        setMessages(history);
+        scrollToBottom();
+      } catch (error) {
+        console.error('Error:', error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchChatHistory();
+  }, [token, onLogout]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      scrollToBottom();
+    }
+  }, [messages, isLoading]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
+  useEffect(() => {
+    if (popupMessage) {
+      const timer = setTimeout(() => {
+        setPopupMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [popupMessage]);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage: Message = {
+      id: messages.length + 1,
+      text: input,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setMessages([...messages, userMessage]);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input_text: input })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+
+      const botMessage: Message = {
+        id: messages.length + 2,
+        text: data.response_text,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setMessages([...messages, userMessage, botMessage]);
+      
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage: Message = {
+        id: messages.length + 2,
+        text: 'Sorry 😔, but i am not able to recognize it.',
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages([...messages, userMessage, errorMessage]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectClick = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedMessages(new Set());
+  };
+
+  const handleChatClick = (id: number) => {
+    if (!selectionMode) return;
+    setSelectedMessages(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleDeleteClick = () => {
+    if (selectedMessages.size === 0) {
+      setPopupMessage("Please select messages to delete.");
+      return;
+    }
+
+    setMessages(prevMessages => prevMessages.filter(message => !selectedMessages.has(message.id)));
+    setSelectedMessages(new Set());
+    setPopupMessage(`${selectedMessages.size} message(s) deleted.`);
+  };
+
+  const handleCopyClick = async () => {
+    if (selectedMessages.size === 0) {
+      setPopupMessage("Please select messages to copy.");
+      return;
+    }
+
+    const selectedText = Array.from(selectedMessages).map(id => {
+      const message = messages.find(msg => msg.id === id);
+      return message ? message.text : "";
+    }).join("\n");
+
+    try {
+      await navigator.clipboard.writeText(selectedText);
+      setPopupMessage(`${selectedMessages.size} message(s) copied to clipboard.`);
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      setPopupMessage('Failed to copy messages to clipboard.');
+    }
+  };
+
+  const closePopup = () => {
+    setPopupMessage(null);
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString();
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString();
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <nav className="bg-white shadow-sm animate-fade-in-down">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center animate-fade-in-left">
-              <Bot className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">Mr.Doc</span>
-            </div>
-            <div className="flex space-x-4 animate-fade-in-right">
-{/*               <button
-                onClick={() => onAuthClick(true)}
-                className="px-4 py-2 rounded-md text-indigo-600 hover:bg-indigo-50 transition-colors"
+    <div className={`flex flex-col h-screen ${theme === 'light' ? 'bg-gray-150' : 'bg-gray-800 text-white'}`}>
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center" onClick={toggleTheme}>
+            <Bot className="h-8 w-8 text-indigo-600" />
+            <span className="ml-2 text-xl font-bold text-gray-900">Mr.Doc</span>
+          </div>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <User className="h-5 w-5 mr-2" />
+              <span className="ml-2">{username ? username : 'Options'}</span>
+              {dropdownOpen ? (
+                <ChevronUp className="ml-2 h-5 w-5 transition-transform transform rotate-180" />
+              ) : (
+                <ChevronDown className="ml-2 h-5 w-5 transition-transform transform rotate-0" />
+              )}
+            </button>
+            {dropdownOpen && (
+              <div className={`absolute right-0 mt-2 w-48 ${theme === 'light' ? 'bg-white' : 'bg-gray-700'} border border-gray-200 rounded-lg shadow-lg`}>
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={handleSelectClick}
+                >
+                  <CheckSquare className="h-5 w-5 inline-block mr-2" />
+                  Select
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={handleCopyClick}
+                >
+                  <Clipboard className="h-5 w-5 inline-block mr-2" />
+                  Copy
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={handleDeleteClick}
+                >
+                  <Trash className="h-5 w-5 inline-block mr-2" />
+                  Delete
+                </button>
+                <button
+                  onClick={onLogout}
+                  className="block w-full text-left px-4 py-2 text-red-700 hover:bg-gray-100"
+                >
+                  <LogOut className="h-5 w-5 inline-block mr-2" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message, index) => (
+          <div
+            key={message.id}
+            className={`${selectedMessages.has(message.id) ? 'bg-gray-300 p-2' : ''}`}
+            onClick={() => handleChatClick(message.id)}
+          >
+            {index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp) ? (
+              <div className="text-gray-500 text-center mb-4">
+                {formatDate(message.timestamp)}
+              </div>
+            ) : null}
+            <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                  message.isUser ? 'bg-indigo-600 text-white' : 'bg-white shadow-sm text-gray-900'
+                }`}
               >
-                Login
-              </button> */}
-              <button
-                onClick={() => onAuthClick(false)}
-                className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
-              >
-                 Register 
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center animate-fade-in-up">
-          <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
-            Meet Mr.Doc, Your Personal Medical Assistant !
-          </h1>
-          <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
-            Experience the power of AI-driven conversations with Mr.Doc. Get instant responses, 
-            smart suggestions, and helpful insights tailored just for you.
-          </p>
-        </div>
-
-        <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-3">
-          <div className="animate-fade-in-up animate-delay-100">
-            <FeatureCard
-              icon={<MessageSquare className="h-8 w-8 text-indigo-600" />}
-              title="Natural Conversations"
-              description="Chat naturally with Mr.Doc who understands context and provides relevant responses."
-            />
-          </div>
-          <div className="animate-fade-in-up animate-delay-200">
-            <FeatureCard
-              icon={<Shield className="h-8 w-8 text-indigo-600" />}
-              title="Secure & Private"
-              description="Your conversations are encrypted and private, ensuring your data stays safe."
-            />
-          </div>
-          <div className="animate-fade-in-up animate-delay-300">
-            <FeatureCard
-              icon={<Users className="h-8 w-8 text-indigo-600" />}
-              title="24/7 Availability"
-              description="Get assistance anytime, anywhere. Mr.Doc is always ready to help."
-            />
-          </div>
-        </div>
-
-        <div className="mt-20 bg-yellow-50 border border-yellow-200 rounded-lg p-6 animate-fade-in-up animate-delay-400">
-          <div className="flex items-start space-x-4">
-            <AlertTriangle className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="text-lg font-semibold text-yellow-800">Important Notice</h3>
-              <div className="mt-2 text-yellow-700 space-y-2">
-                <p>Mr.Doc is not a replacement for professional medical consultation it is just to help out from certain situations. Please note:</p>
-                <ul className="list-disc list-inside ml-4 space-y-1">
-                  <li>Mr.Doc is designed to assist and provide general information with approximately 90% accuracy</li>
-                  <li>Always consult with healthcare professionals for medical advice</li>
-                  <li>Verify critical information with qualified medical practitioners</li>
-                  <li>In case of emergency, contact emergency services immediately</li>
-                </ul>
+                {message.text}
+                <div className="text-xs text-gray-500 mt-1">
+                  {formatTime(message.timestamp)}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ))}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-lg px-4 py-2 bg-white shadow-sm text-gray-900">
+              <Bot className="h-5 w-5 text-indigo-600 animate-bounce" />
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
 
-        <div className="mt-12 text-center animate-fade-in-up animate-delay-500">
+      <form onSubmit={handleSend} className="p-4 bg-white border-t">
+        <div className="max-w-7xl mx-auto flex gap-4">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
           <button
-            onClick={handleStartChat}
-            className="inline-flex items-center px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all hover:scale-105 transform"
+            type="submit"
+            className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
+            disabled={loading}
           >
-            Let's Start Chatting
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <Send className="h-5 w-5" />
           </button>
         </div>
-      </main>
+      </form>
 
-      <footer className="bg-white mt-auto animate-fade-in-up">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="animate-fade-in-left">
-              <div className="flex items-center">
-                <Bot className="h-8 w-8 text-indigo-600" />
-                <span className="ml-2 text-xl font-bold text-gray-900">Mr.Doc</span>
-              </div>
-              <p className="mt-4 text-gray-600">
-                Your trusted AI health assistant, available 24/7 to provide guidance and information.
-              </p>
-            </div>
-            <div className="animate-fade-in-up animate-delay-100">
-              <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Important Links</h3>
-              <ul className="mt-4 space-y-4">
-                <li>
-                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
-                    Medical Disclaimer
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div className="animate-fade-in-right">
-              <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Contact</h3>
-              <ul className="mt-4 space-y-4">
-                <li>
-                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
-                    Support
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
-                    Emergency Contacts
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
-                    Find a Doctor
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 border-t border-gray-200 pt-8 text-center animate-fade-in-up animate-delay-200">
-            <p className="text-base text-gray-400">
-              &copy; 2025 Mr.Doc. All rights reserved.
-            </p>
-          </div>
+      {popupMessage && (
+        <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg">
+          {popupMessage}
+          <button onClick={closePopup} className="ml-4 text-red-500">
+            Close
+          </button>
         </div>
-      </footer>
+      )}
     </div>
   );
 };
 
-const FeatureCard: React.FC<{
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}> = ({ icon, title, description }) => (
-  <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all hover:scale-105 transform">
-    <div className="flex flex-col items-center text-center">
-      {icon}
-      <h3 className="mt-4 text-lg font-medium text-gray-900">{title}</h3>
-      <p className="mt-2 text-gray-600">{description}</p>
-    </div>
-  </div>
-);
-
-export default LandingPage;
+export default ChatPage;
