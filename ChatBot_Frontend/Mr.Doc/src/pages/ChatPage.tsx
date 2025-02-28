@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User } from 'lucide-react';
+import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
+import { Send, Bot, LogOut, ChevronDown, ChevronUp, Clipboard, Trash, CheckSquare, User, Upload } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Message {
@@ -7,6 +7,7 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  file?: File;
 }
 
 interface ChatPageProps {
@@ -16,6 +17,7 @@ interface ChatPageProps {
 const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -117,27 +119,34 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !file) return;
 
     const userMessage: Message = {
       id: messages.length + 1,
       text: input,
       isUser: true,
-      timestamp: new Date()
+      timestamp: new Date(),
+      file: file || undefined
     };
 
     setMessages([...messages, userMessage]);
     setInput("");
+    setFile(null);
     setLoading(true);
 
     try {
+      const formData = new FormData();
+      formData.append('input_text', input);
+      if (file) {
+        formData.append('file', file);
+      }
+
       const response = await fetch('https://aidocbackend.pythonanywhere.com/api/chat/prompts/get_gemini_response/', {
         method: 'POST',
         headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Token ${token}`
         },
-        body: JSON.stringify({ input_text: input })
+        body: formData
       });
 
       if (!response.ok) {
@@ -165,6 +174,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       setMessages([...messages, userMessage, errorMessage]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
     }
   };
 
@@ -335,6 +350,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
             placeholder="Type your message..."
             className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
+          <input
+            type="file"
+            onChange={handleFileChange}
+            className="hidden"
+            id="file-upload"
+          />
+          <label htmlFor="file-upload" className="bg-gray-200 text-gray-700 rounded-lg px-4 py-2 cursor-pointer hover:bg-gray-300 transition-colors">
+            <Upload className="h-5 w-5" />
+          </label>
           <button
             type="submit"
             className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
