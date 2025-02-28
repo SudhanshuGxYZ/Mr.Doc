@@ -279,7 +279,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 </button>
                 <button
                   onClick={onLogout}
-                  className="block w-full text-left px-4 py-2 text-indigo-700 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 text-red-700 hover:bg-gray-100"
                 >
                   <LogOut className="h-5 w-5 inline-block mr-2" />
                   Logout
