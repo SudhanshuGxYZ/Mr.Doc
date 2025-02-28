@@ -26,7 +26,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     // <div className="min-h-screen flex flex-col">
-    <div className="min-h-screen flex flex-col bg-gradient-to-r from-blue-500 to-gray-500">
+    <div className="min-h-screen flex flex-col bg-gradient-to-r from-blue-200 to-gray-400">
       <nav className="bg-white shadow-sm animate-fade-in-down">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
