@@ -176,6 +176,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     });
   };
 
+  const handleDeleteClick = () => {
+    setMessages(messages.filter(message => !selectedMessages.has(message.id)));
+    setSelectedMessages(new Set());
+  };
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString();
   };
@@ -226,6 +231,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={handleDeleteClick}
                 >
                   <Trash className="h-5 w-5 inline-block mr-2" />
                   Delete
