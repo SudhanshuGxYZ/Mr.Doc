@@ -19,6 +19,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [input, setInput] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileContent, setFileContent] = useState<string>("");
+  const [filePreview, setFilePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -133,6 +134,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     setMessages([...messages, userMessage]);
     setInput("");
     setFile(null);
+    setFilePreview(null);
     setLoading(true);
 
     try {
@@ -186,9 +188,19 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
 
       const reader = new FileReader();
       reader.onload = (event) => {
-        setFileContent(event.target?.result as string);
+        const result = event.target?.result;
+        if (typeof result === 'string') {
+          setFileContent(result);
+        }
+        if (selectedFile.type.startsWith('image/')) {
+          setFilePreview(result as string);
+        } else if (selectedFile.type === 'application/pdf') {
+          setFilePreview(result as string);
+        } else {
+          setFilePreview(null);
+        }
       };
-      reader.readAsText(selectedFile);
+      reader.readAsDataURL(selectedFile);
     }
   };
 
@@ -381,7 +393,17 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       {file && (
         <div className="p-4 bg-white border-t">
           <h3 className="text-lg font-bold">File Preview:</h3>
-          <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">{fileContent}</pre>
+          {filePreview ? (
+            file.type.startsWith('image/') ? (
+              <img src={filePreview} alt="File Preview" className="rounded-lg" />
+            ) : file.type === 'application/pdf' ? (
+              <iframe src={filePreview} className="w-full h-72 rounded-lg" title="PDF Preview"></iframe>
+            ) : (
+              <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">{fileContent}</pre>
+            )
+          ) : (
+            <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">{fileContent}</pre>
+          )}
           <textarea
             value={fileContent}
             onChange={(e) => setFileContent(e.target.value)}
