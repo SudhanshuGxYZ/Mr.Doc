@@ -246,7 +246,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-800 transition-colors"
             >
               <User className="h-5 w-5 mr-2" />
               <span className="ml-2">{username ? username : 'Options'}</span>
