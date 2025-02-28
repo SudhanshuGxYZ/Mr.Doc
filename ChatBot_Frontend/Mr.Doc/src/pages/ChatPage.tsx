@@ -344,13 +344,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       <form onSubmit={handleSend} className="p-4 bg-white border-t">
         <div className="max-w-7xl mx-auto flex gap-4">
           <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <input
             type="file"
             onChange={handleFileChange}
             className="hidden"
@@ -359,6 +352,13 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           <label htmlFor="file-upload" className="bg-gray-200 text-gray-700 rounded-lg px-4 py-2 cursor-pointer hover:bg-gray-300 transition-colors">
             <Upload className="h-5 w-5" />
           </label>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
           <button
             type="submit"
             className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 transition-colors"
