@@ -21,6 +21,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
+  const [popupMessage, setPopupMessage] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -105,6 +106,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     };
   }, [dropdownOpen]);
 
+  useEffect(() => {
+    if (popupMessage) {
+      const timer = setTimeout(() => {
+        setPopupMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [popupMessage]);
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -177,8 +187,38 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   };
 
   const handleDeleteClick = () => {
-    setMessages(messages.filter(message => !selectedMessages.has(message.id)));
+    if (selectedMessages.size === 0) {
+      setPopupMessage("Please select messages to delete.");
+      return;
+    }
+
+    setMessages(prevMessages => prevMessages.filter(message => !selectedMessages.has(message.id)));
     setSelectedMessages(new Set());
+    setPopupMessage(`${selectedMessages.size} message(s) deleted.`);
+  };
+
+  const handleCopyClick = async () => {
+    if (selectedMessages.size === 0) {
+      setPopupMessage("Please select messages to copy.");
+      return;
+    }
+
+    const selectedText = Array.from(selectedMessages).map(id => {
+      const message = messages.find(msg => msg.id === id);
+      return message ? message.text : "";
+    }).join("\n");
+
+    try {
+      await navigator.clipboard.writeText(selectedText);
+      setPopupMessage(`${selectedMessages.size} message(s) copied to clipboard.`);
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      setPopupMessage('Failed to copy messages to clipboard.');
+    }
+  };
+
+  const closePopup = () => {
+    setPopupMessage(null);
   };
 
   const formatDate = (date: Date) => {
@@ -225,6 +265,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={handleCopyClick}
                 >
                   <Clipboard className="h-5 w-5 inline-block mr-2" />
                   Copy
@@ -303,6 +344,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
           </button>
         </div>
       </form>
+
+      {popupMessage && (
+        <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg">
+          {popupMessage}
+          <button onClick={closePopup} className="ml-4 text-red-500">
+            Close
+          </button>
+        </div>
+      )}
     </div>
   );
 };
