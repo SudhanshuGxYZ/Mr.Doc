@@ -154,10 +154,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       };
 
       setMessages([...messages, userMessage, botMessage]);
-
-      // Announce the bot's reply
-    const utterance = new SpeechSynthesisUtterance(data.response_text);
-    speechSynthesis.speak(utterance);
       
     } catch (error) {
       console.error('Error:', error);
