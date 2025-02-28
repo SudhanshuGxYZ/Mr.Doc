@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bot, MessageSquare, Users, Shield, ArrowRight, AlertTriangle } from 'lucide-react';
 
@@ -6,6 +6,11 @@ interface LandingPageProps {
   onAuthClick: (isLogin: boolean) => void;
   isAuthenticated: boolean;
   onPageTransition: () => void;
+
+
+
+
+
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ 
@@ -14,33 +19,165 @@ const LandingPage: React.FC<LandingPageProps> = ({
   onPageTransition 
 }) => {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isAuthenticated) {
       onPageTransition();
       navigate('/chat');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
   }, [isAuthenticated, navigate, onPageTransition]);
 
+
+
+
+
+
+
+
+
+
   const handleStartChat = () => {
     onAuthClick(true);
-  };
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-gray-800 text-white'}`}>
-      <nav className="shadow-sm animate-fade-in-down">
+    <div className="min-h-screen flex flex-col">
+      <nav className="bg-white shadow-sm animate-fade-in-down">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center animate-fade-in-left" onClick={toggleTheme}>
+            <div className="flex items-center animate-fade-in-left">
               <Bot className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold">Mr.Doc</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">Mr.Doc</span>
             </div>
             <div className="flex space-x-4 animate-fade-in-right">
 {/*               <button
@@ -62,10 +199,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center animate-fade-in-up">
-          <h1 className="text-4xl font-bold sm:text-6xl">
+          <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
             Meet Mr.Doc, Your Personal Medical Assistant !
           </h1>
-          <p className="mt-6 text-xl max-w-3xl mx-auto">
+          <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
             Experience the power of AI-driven conversations with Mr.Doc. Get instant responses, 
             smart suggestions, and helpful insights tailored just for you.
           </p>
@@ -85,6 +222,65 @@ const LandingPage: React.FC<LandingPageProps> = ({
               title="Secure & Private"
               description="Your conversations are encrypted and private, ensuring your data stays safe."
             />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           </div>
           <div className="animate-fade-in-up animate-delay-300">
             <FeatureCard
@@ -92,8 +288,48 @@ const LandingPage: React.FC<LandingPageProps> = ({
               title="24/7 Availability"
               description="Get assistance anytime, anywhere. Mr.Doc is always ready to help."
             />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           </div>
         </div>
+
 
         <div className="mt-20 bg-yellow-50 border border-yellow-200 rounded-lg p-6 animate-fade-in-up animate-delay-400">
           <div className="flex items-start space-x-4">
@@ -108,6 +344,125 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   <li>Verify critical information with qualified medical practitioners</li>
                   <li>In case of emergency, contact emergency services immediately</li>
                 </ul>
+
+
+
+
+
+
+
+
+
               </div>
             </div>
-          </
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+        <div className="mt-12 text-center animate-fade-in-up animate-delay-500">
+
+
+
+
+
+
+
+
+          <button
+            onClick={handleStartChat}
+            className="inline-flex items-center px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all hover:scale-105 transform"
+
+          >
+            Let's Start Chatting
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </button>
+        </div>
+      </main>
+
+      <footer className="bg-white mt-auto animate-fade-in-up">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="animate-fade-in-left">
+              <div className="flex items-center">
+                <Bot className="h-8 w-8 text-indigo-600" />
+                <span className="ml-2 text-xl font-bold text-gray-900">Mr.Doc</span>
+              </div>
+              <p className="mt-4 text-gray-600">
+                Your trusted AI health assistant, available 24/7 to provide guidance and information.
+              </p>
+            </div>
+            <div className="animate-fade-in-up animate-delay-100">
+              <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Important Links</h3>
+              <ul className="mt-4 space-y-4">
+                <li>
+                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
+                    Medical Disclaimer
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="animate-fade-in-right">
+              <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Contact</h3>
+              <ul className="mt-4 space-y-4">
+                <li>
+                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
+                    Support
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
+                    Emergency Contacts
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-base text-gray-600 hover:text-gray-900 transition-colors">
+                    Find a Doctor
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-gray-200 pt-8 text-center animate-fade-in-up animate-delay-200">
+            <p className="text-base text-gray-400">
+              &copy; 2025 Mr.Doc. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+const FeatureCard: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}> = ({ icon, title, description }) => (
+  <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all hover:scale-105 transform">
+    <div className="flex flex-col items-center text-center">
+      {icon}
+      <h3 className="mt-4 text-lg font-medium text-gray-900">{title}</h3>
+      <p className="mt-2 text-gray-600">{description}</p>
+    </div>
+  </div>
+);
+
+export default LandingPage;
