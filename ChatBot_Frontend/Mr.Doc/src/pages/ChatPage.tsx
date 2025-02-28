@@ -181,7 +181,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     }
 };
 
- const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
         const selectedFile = e.target.files[0];
         setFile(selectedFile);
