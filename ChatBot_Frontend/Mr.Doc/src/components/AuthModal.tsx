@@ -7,10 +7,6 @@ interface AuthModalProps {
   onClose: () => void;
   onSuccess: (token: string) => void;
   onToggleMode: () => void;
-
-
-
-
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({
@@ -24,8 +20,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-
 
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -55,106 +49,16 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
     const data = await response.json();
 
-
-
-
-
-
-
-
     localStorage.setItem('token', data.token);
     localStorage.setItem('username', username); // Store the username
 
-
-
-
-
-
-
-
     if (!isLogin) {
       setLoading(false);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
     onSuccess(data.token); // Proceed to landing page or chat on successful login/signup
     
   } catch (error) {
     if (!isLogin) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       setLoading(false);
     }
@@ -226,102 +130,16 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
 
-
-
-
-
-
-
-
-
-
-
-
             <button
               type="submit"
               className="w-full bg-indigo-600 text-white rounded-md px-4 py-2 hover:bg-indigo-700 transition-colors"
             >
               {isLogin ? 'Login' : 'Sign Up'}
-
-
-
-
-
             </button>
           </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         )}
-
-
-
         <p className="mt-4 text-center text-sm text-gray-600">
           {isLogin ? "Don't have an account?" : "Already have an account?"}
-
-
-
-
-
-
-
           <button
             onClick={onToggleMode}
             className="ml-1 text-indigo-600 hover:text-indigo-500"
