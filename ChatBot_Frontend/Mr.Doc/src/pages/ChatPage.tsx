@@ -154,11 +154,16 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
       };
 
       setMessages([...messages, userMessage, botMessage]);
+
+      // Announce the bot's reply
+    const utterance = new SpeechSynthesisUtterance(data.response_text);
+    speechSynthesis.speak(utterance);
+      
     } catch (error) {
       console.error('Error:', error);
       const errorMessage: Message = {
         id: messages.length + 2,
-        text: 'An error occurred. Please try again later.',
+        text: 'Sorry 😔, but i am not able to recognize it.',
         isUser: false,
         timestamp: new Date()
       };
