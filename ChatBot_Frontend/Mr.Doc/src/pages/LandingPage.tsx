@@ -36,12 +36,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <span className="ml-2 text-xl font-bold text-gray-900">Mr.Doc</span>
             </div>
             <div className="flex space-x-4 animate-fade-in-right">
-              <button
+{/*               <button
                 onClick={() => onAuthClick(true)}
                 className="px-4 py-2 rounded-md text-indigo-600 hover:bg-indigo-50 transition-colors"
               >
                 Login
-              </button>
+              </button> */}
               <button
                 onClick={() => onAuthClick(false)}
                 className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
