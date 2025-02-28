@@ -46,7 +46,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={() => onAuthClick(false)}
                 className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
               >
-                Sign Up
+                ! Register !
               </button>
             </div>
           </div>
