@@ -181,28 +181,28 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     }
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+ const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result;
-        if (typeof result === 'string') {
-          setFileContent(result);
-        }
-        if (selectedFile.type.startsWith('image/')) {
-          setFilePreview(result as string);
-        } else if (selectedFile.type === 'application/pdf') {
-          setFilePreview(result as string);
-        } else {
-          setFilePreview(null);
-        }
-      };
-      reader.readAsDataURL(selectedFile);
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const result = event.target?.result;
+            if (typeof result === 'string') {
+                setFileContent(result);
+            }
+            if (['image/jpeg', 'image/jpg', 'image/webp', 'image/png', 'image/svg+xml'].includes(selectedFile.type)) {
+                setFilePreview(result as string);
+            } else if (selectedFile.type === 'application/pdf') {
+                setFilePreview(result as string);
+            } else {
+                setFilePreview(null);
+            }
+        };
+        reader.readAsDataURL(selectedFile);
     }
-  };
+};
 
   const handleSelectClick = () => {
     setSelectionMode(!selectionMode);
