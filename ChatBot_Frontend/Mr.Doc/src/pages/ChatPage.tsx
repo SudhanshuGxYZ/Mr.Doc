@@ -22,7 +22,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
   const [popupMessage, setPopupMessage] = useState<string | null>(null);
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -231,21 +230,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
     return date.toLocaleTimeString();
   };
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
-
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <div className={`flex flex-col h-screen ${theme === 'light' ? 'bg-gray-150' : 'bg-gray-800 text-white'}`}>
+    <div className="flex flex-col h-screen bg-gray-150">
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center" onClick={toggleTheme}>
+          <div className="flex items-center">
             <Bot className="h-8 w-8 text-indigo-600" />
             <span className="ml-2 text-xl font-bold text-gray-900">Mr.Doc</span>
           </div>
@@ -263,7 +256,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ onLogout }) => {
               )}
             </button>
             {dropdownOpen && (
-              <div className={`absolute right-0 mt-2 w-48 ${theme === 'light' ? 'bg-white' : 'bg-gray-700'} border border-gray-200 rounded-lg shadow-lg`}>
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                   onClick={handleSelectClick}
