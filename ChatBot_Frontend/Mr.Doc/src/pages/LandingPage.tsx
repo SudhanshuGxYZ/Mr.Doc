@@ -55,7 +55,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center animate-fade-in-up">
           <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
-            Meet Mr.Doc, Your Personal Medical Assistant !
+            Meet Mr.Doc, Your Personal Mental Health Assistant !
           </h1>
           <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
             Experience the power of AI-driven conversations with Mr.Doc. Get instant responses, 
